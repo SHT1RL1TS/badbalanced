@@ -106,4 +106,4 @@ heroes (1) ── (M) skills
 MIT
 
 👥 Авторы
-ButBalanced Team
+BadBalanced Team
