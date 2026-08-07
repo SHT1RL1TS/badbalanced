@@ -1,4 +1,10 @@
 <?php
+
+if(!isset($_SESSION['user_name']))
+{
+    Header('Location:home');
+}
+
 $heroes = getAllHeroes($db);
 $message = '';
 $current_index = isset($_POST['current_index']) ? (int)$_POST['current_index'] : 0;
@@ -23,29 +29,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
 
             // Собираем JSON для roles
             $roles = [
-                'core' => (int)($_POST['role_core'] ?? 0),
-                'support' => (int)($_POST['role_support'] ?? 0),
-                'burst' => (int)($_POST['role_burst'] ?? 0),
-                'control' => (int)($_POST['role_control'] ?? 0),
-                'jungle' => (int)($_POST['role_jungle'] ?? 0),
-                'tank' => (int)($_POST['role_tank'] ?? 0),
-                'escape' => (int)($_POST['role_escape'] ?? 0),
-                'siege' => (int)($_POST['role_siege'] ?? 0),
-                'initiation' => (int)($_POST['role_initiation'] ?? 0)
+                'core' => (int)($_POST['core'] ?? 0),
+                'support' => (int)($_POST['support'] ?? 0),
+                'burst' => (int)($_POST['burst'] ?? 0),
+                'control' => (int)($_POST['control'] ?? 0),
+                'jungle' => (int)($_POST['jungle'] ?? 0),
+                'tank' => (int)($_POST['tank'] ?? 0),
+                'escape' => (int)($_POST['escape'] ?? 0),
+                'siege' => (int)($_POST['siege'] ?? 0),
+                'initiation' => (int)($_POST['initiation'] ?? 0)
             ];
             $roles_json = json_encode($roles, JSON_UNESCAPED_UNICODE);
 
             // Собираем JSON для stats
             $stats = [
-                'damage' => $_POST['stat_damage'] ?? '',
-                'attack_interval' => (float)($_POST['stat_attack_interval'] ?? 0),
-                'range' => (int)($_POST['stat_range'] ?? 0),
-                'projectile_speed' => (int)($_POST['stat_projectile_speed'] ?? 0),
-                'armor' => (float)($_POST['stat_armor'] ?? 0),
-                'magic_resist' => (int)($_POST['stat_magic_resist'] ?? 0),
-                'move_speed' => (int)($_POST['stat_move_speed'] ?? 0),
-                'turn_rate' => (int)($_POST['stat_turn_rate'] ?? 0),
-                'vision' => $_POST['stat_vision'] ?? ''
+                'damage' => $_POST['damage'] ?? '',
+                'attack_interval' => (float)($_POST['attack_interval'] ?? 0),
+                'range' => (int)($_POST['range'] ?? 0),
+                'projectile_speed' => (int)($_POST['projectile_speed'] ?? 0),
+                'armor' => (float)($_POST['armor'] ?? 0),
+                'magic_resist' => (int)($_POST['magic_resist'] ?? 0),
+                'move_speed' => (int)($_POST['move_speed'] ?? 0),
+                'turn_rate' => (int)($_POST['turn_rate'] ?? 0),
+                'vision' => $_POST['vision'] ?? ''
             ];
             $stats_json = json_encode($stats, JSON_UNESCAPED_UNICODE);
 
@@ -192,8 +198,13 @@ if ($hero_id > 0) {
         $stmt->execute();
         $hero_data = $stmt->fetch(PDO::FETCH_ASSOC);
         print_r($hero_data);
-        // $roles_data = json_decode($hero_data['roles'], true);
-        // $stats_data = json_decode($hero_data['stats'], true);
+        if ($hero_data) {
+            $roles_data = json_decode($hero_data['roles'], true);
+            $stats_data = json_decode($hero_data['stats'], true);
+        } else {
+            $roles_data = null;
+            $stats_data = null;
+        }
     }
 }
 
@@ -352,23 +363,23 @@ $page_hero_name = ($current_hero && !empty($current_hero['name_hero'])) ? $curre
                 <h5 class="section-title"><i class="bi bi-tags"></i> Роли (JSON)</h5>
                 <div class="row">
                     <?php
-                    $role_fields = [
-                        'role_core' => 'Основа',
-                        'role_support' => 'Поддержка',
-                        'role_burst' => 'Быстрый урон',
-                        'role_control' => 'Контроль',
-                        'role_jungle' => 'Лес',
-                        'role_tank' => 'Стойкость',
-                        'role_escape' => 'Побег',
-                        'role_siege' => 'Осада',
-                        'role_initiation' => 'Инициация'
+                    $fields = [
+                        'core' => 'Основа',
+                        'support' => 'Поддержка',
+                        'burst' => 'Быстрый урон',
+                        'control' => 'Контроль',
+                        'jungle' => 'Лес',
+                        'tank' => 'Стойкость',
+                        'escape' => 'Побег',
+                        'siege' => 'Осада',
+                        'initiation' => 'Инициация'
                     ];
-                    foreach ($role_fields as $field => $label):
+                    foreach ($fields as $field => $label):
                     ?>
                     <div class="col-md-4 mb-2">
                         <label for="<?php echo $field; ?>" class="form-label"><?php echo $label; ?></label>
                         <input type="number" class="form-control" id="<?php echo $field; ?>" name="<?php echo $field; ?>"
-                            value="<?php echo htmlspecialchars($roles_data[str_replace('role_', '', $field)] ?? 0); ?>" min="0" max="5">
+                            value="<?php echo htmlspecialchars($roles_data[str_replace('', '', $field)] ?? 0); ?>" min="0" max="5">
                     </div>
                     <?php endforeach; ?>
                 </div>
@@ -382,49 +393,49 @@ $page_hero_name = ($current_hero && !empty($current_hero['name_hero'])) ? $curre
                 <h5 class="section-title"><i class="bi bi-gear"></i> Статистика (JSON)</h5>
                 <div class="row">
                     <div class="col-md-6 mb-3">
-                        <label for="stat_damage" class="form-label">Урон</label>
-                        <input type="text" class="form-control" id="stat_damage" name="stat_damage"
-                            value="<?php echo htmlspecialchars($stats_data['урон'] ?? ''); ?>">
+                        <label for="damage" class="form-label">Урон</label>
+                        <input type="text" class="form-control" id="damage" name="damage"
+                            value="<?php echo htmlspecialchars($stats_data['damage'] ?? ''); ?>">
                     </div>
                     <div class="col-md-6 mb-3">
-                        <label for="stat_attack_interval" class="form-label">Интервал атак</label>
-                        <input type="number" step="0.01" class="form-control" id="stat_attack_interval" name="stat_attack_interval"
-                            value="<?php echo htmlspecialchars($stats_data['интервал_атак'] ?? ''); ?>">
+                        <label for="attack_interval" class="form-label">Интервал атак</label>
+                        <input type="number" step="0.01" class="form-control" id="attack_interval" name="attack_interval"
+                            value="<?php echo htmlspecialchars($stats_data['attack_interval'] ?? ''); ?>">
                     </div>
                     <div class="col-md-3 mb-3">
-                        <label for="stat_range" class="form-label">Дальность</label>
-                        <input type="number" class="form-control" id="stat_range" name="stat_range"
-                            value="<?php echo htmlspecialchars($stats_data['дальность'] ?? ''); ?>">
+                        <label for="range" class="form-label">Дальность</label>
+                        <input type="number" class="form-control" id="range" name="range"
+                            value="<?php echo htmlspecialchars($stats_data['range'] ?? ''); ?>">
                     </div>
                     <div class="col-md-3 mb-3">
-                        <label for="stat_projectile_speed" class="form-label">Скорость снаряда</label>
-                        <input type="number" class="form-control" id="stat_projectile_speed" name="stat_projectile_speed"
-                            value="<?php echo htmlspecialchars($stats_data['скорость_снаряда'] ?? ''); ?>">
+                        <label for="projectile_speed" class="form-label">Скорость снаряда</label>
+                        <input type="number" class="form-control" id="projectile_speed" name="projectile_speed"
+                            value="<?php echo htmlspecialchars($stats_data['projectile_speed'] ?? ''); ?>">
                     </div>
                     <div class="col-md-3 mb-3">
-                        <label for="stat_armor" class="form-label">Защита</label>
-                        <input type="number" step="0.01" class="form-control" id="stat_armor" name="stat_armor"
-                            value="<?php echo htmlspecialchars($stats_data['защита'] ?? ''); ?>">
+                        <label for="armor" class="form-label">Защита</label>
+                        <input type="number" step="0.1" class="form-control" id="armor" name="armor"
+                            value="<?php echo htmlspecialchars($stats_data['armor'] ?? ''); ?>">
                     </div>
                     <div class="col-md-3 mb-3">
-                        <label for="stat_magic_resist" class="form-label">Magic Resist</label>
-                        <input type="number" class="form-control" id="stat_magic_resist" name="stat_magic_resist"
+                        <label for="magic_resist" class="form-label">Magic Resist</label>
+                        <input type="number" class="form-control" id="magic_resist" name="magic_resist"
                             value="<?php echo htmlspecialchars($stats_data['magic_resist'] ?? ''); ?>">
                     </div>
                     <div class="col-md-4 mb-3">
-                        <label for="stat_move_speed" class="form-label">Скорость передвижения</label>
-                        <input type="number" class="form-control" id="stat_move_speed" name="stat_move_speed"
-                            value="<?php echo htmlspecialchars($stats_data['скорость_передвижения'] ?? ''); ?>">
+                        <label for="move_speed" class="form-label">Скорость передвижения</label>
+                        <input type="number" min="100" class="form-control" id="move_speed" name="move_speed"
+                            value="<?php echo htmlspecialchars($stats_data['move_speed'] ?? ''); ?>">
                     </div>
                     <div class="col-md-4 mb-3">
-                        <label for="stat_turn_rate" class="form-label">Скорость вращения</label>
-                        <input type="number" class="form-control" id="stat_turn_rate" name="stat_turn_rate"
+                        <label for="turn_rate" class="form-label">Скорость вращения</label>
+                        <input type="number" step="0.1" class="form-control" id="turn_rate" name="turn_rate"
                             value="<?php echo htmlspecialchars($stats_data['скорость_вращения'] ?? ''); ?>">
                     </div>
                     <div class="col-md-4 mb-3">
-                        <label for="stat_vision" class="form-label">Дальность видимости</label>
-                        <input type="text" class="form-control" id="stat_vision" name="stat_vision"
-                            value="<?php echo htmlspecialchars($stats_data['дальность_видимости'] ?? ''); ?>" placeholder="1800/800">
+                        <label for="vision" class="form-label">Дальность видимости</label>
+                        <input type="text" pattern="{4}[0-9]/{4}[0-9]" class="form-control" id="vision" name="vision"
+                            value="<?php echo htmlspecialchars($stats_data['vision'] ?? ''); ?>" placeholder="1800/800">
                     </div>
                 </div>
                 <div class="json-preview">
@@ -498,38 +509,38 @@ document.getElementById('name_hero').addEventListener('input', function(e) {
 });
 
 // Обновление JSON превью
-document.querySelectorAll('[name^="role_"]').forEach(input => {
+document.querySelectorAll('[name^=""]').forEach(input => {
     input.addEventListener('input', updateRolesPreview);
 });
 function updateRolesPreview() {
     const roles = {
-        core: document.getElementById('role_core').value || 0,
-        support: document.getElementById('role_support').value || 0,
-        burst: document.getElementById('role_burst').value || 0,
-        control: document.getElementById('role_control').value || 0,
-        jungle: document.getElementById('role_jungle').value || 0,
-        tank: document.getElementById('role_tank').value || 0,
-        escape: document.getElementById('role_escape').value || 0,
-        siege: document.getElementById('role_siege').value || 0,
-        initiation: document.getElementById('role_initiation').value || 0
+        core: document.getElementById('core').value || 0,
+        support: document.getElementById('support').value || 0,
+        burst: document.getElementById('burst').value || 0,
+        control: document.getElementById('control').value || 0,
+        jungle: document.getElementById('jungle').value || 0,
+        tank: document.getElementById('tank').value || 0,
+        escape: document.getElementById('escape').value || 0,
+        siege: document.getElementById('siege').value || 0,
+        initiation: document.getElementById('initiation').value || 0
     };
     document.getElementById('rolesPreview').textContent = JSON.stringify(roles, null, 2);
 }
 
-document.querySelectorAll('[name^="stat_"]').forEach(input => {
+document.querySelectorAll('[name^=""]').forEach(input => {
     input.addEventListener('input', updateStatsPreview);
 });
 function updateStatsPreview() {
     const stats = {
-        damage: document.getElementById('stat_damage').value || '',
-        attack_interval: parseFloat(document.getElementById('stat_attack_interval').value) || 0,
-        range: parseInt(document.getElementById('stat_range').value) || 0,
-        projectile_speed: parseInt(document.getElementById('stat_projectile_speed').value) || 0,
-        armor: parseFloat(document.getElementById('stat_armor').value) || 0,
-        magic_resist: parseInt(document.getElementById('stat_magic_resist').value) || 0,
-        move_speed: parseInt(document.getElementById('stat_move_speed').value) || 0,
-        turn_rate: parseInt(document.getElementById('stat_turn_rate').value) || 0,
-        vision: document.getElementById('stat_vision').value || ''
+        damage: document.getElementById('damage').value || '',
+        attack_interval: parseFloat(document.getElementById('attack_interval').value) || 0,
+        range: parseInt(document.getElementById('range').value) || 0,
+        projectile_speed: parseInt(document.getElementById('projectile_speed').value) || 0,
+        armor: parseFloat(document.getElementById('armor').value) || 0,
+        magic_resist: parseInt(document.getElementById('magic_resist').value) || 0,
+        move_speed: parseInt(document.getElementById('move_speed').value) || 0,
+        turn_rate: parseInt(document.getElementById('turn_rate').value) || 0,
+        vision: document.getElementById('vision').value || ''
     };
     document.getElementById('statsPreview').textContent = JSON.stringify(stats, null, 2);
 }

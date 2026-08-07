@@ -10,8 +10,8 @@
         $host = 'localhost';
         $port = '5432';
         $dbname = 'butbalanced';
-        $user = 'postgres'; // В PostgreSQL суперпользователь называется postgres, а не root!
-        $password_db = 'jdp96n'; // Пароль, который ты установил при инсталляции PostgreSQL
+        $user = 'postgres';
+        $password_db = 'jdp96n';
 
         // Строка подключения
         $connection_string = "host=$host port=$port dbname=$dbname user=$user password=$password_db";
@@ -27,7 +27,6 @@
         $user = pg_fetch_assoc($result);
         if(!empty($user))
         {
-            // print_r($user);
             $_SESSION['user_name'] = $user['login'];
             $_SESSION['user_acl'] = $user['acl'];
             Header('Location:home');
@@ -63,7 +62,6 @@
                 <form class="login-form" method="POST" action="">
                     <div class="form-group">
                         <div class="input-wrapper">
-                            <!-- Важно: placeholder должен быть " ", чтобы CSS понимал, что поле пустое -->
                             <input type="text" id="username" name="username" class="form-input" placeholder=" " required autocomplete="off">
                             <label class="form-label" for="username">Login</label>
                             <span class="input-focus-border"></span>
