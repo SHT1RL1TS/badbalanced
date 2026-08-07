@@ -1,0 +1,15 @@
+RewriteEngine On
+RewriteBase /cd-project/butbalanced/admin/
+
+# Перенаправление patch/edit/name на patches/add_change.php
+RewriteRule ^patch/edit/(.+)$ patches/add_change.php [L,QSA]
+
+# Перенаправление patch/name на patches/view_single_patch.php  
+RewriteRule ^patch/(.+)$ patches/view_single_patch.php [L,QSA]
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+
+RewriteRule ^(.+)$ index.php [QSA,L]
+
+Header set Content-Security-Policy "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://unpkg.com;"

@@ -1,0 +1,343 @@
+:root {
+    --bg-dark: #0d1117;
+    --bg-card: #161b22;
+    --bg-input: #0d1117;
+    --border-color: #30363d;
+    --text-primary: #c9d1d9;
+    --text-secondary: #8b949e;
+    --accent-blue: #58a6ff;
+    --accent-green: #3fb950;
+    --accent-red: #f85149;
+}
+
+body {
+    background: var(--bg-dark);
+    color: var(--text-primary);
+    padding: 20px;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+}
+
+.container-custom {
+    max-width: 1000px;
+    margin: 0 auto;
+}
+
+.card {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 30px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+}
+
+.form-control, .form-select {
+    background: var(--bg-input);
+    border: 1px solid var(--border-color);
+    color: var(--text-primary);
+    border-radius: 8px;
+}
+
+.form-control:focus, .form-select:focus {
+    background: var(--bg-input);
+    border-color: var(--accent-blue);
+    color: var(--text-primary);
+    box-shadow: 0 0 0 3px rgba(88, 166, 255, 0.15);
+}
+
+.form-control::placeholder {
+    color: var(--text-secondary);
+}
+
+.form-label {
+    color: var(--text-secondary);
+    font-weight: 500;
+    font-size: 0.9rem;
+    margin-bottom: 4px;
+}
+
+.section-title {
+    color: var(--text-primary);
+    font-weight: 600;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.section-title i {
+    color: var(--accent-blue);
+}
+
+.form-section {
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 25px;
+    margin-bottom: 25px;
+}
+
+.form-section:last-child {
+    border-bottom: none;
+}
+
+.hero-navigation {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+    padding: 15px 20px;
+    background: var(--bg-input);
+    border-radius: 10px;
+    border: 1px solid var(--border-color);
+}
+
+.hero-info {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.hero-avatar {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: var(--border-color);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+}
+
+.btn-custom {
+    background: var(--bg-input);
+    border: 1px solid var(--border-color);
+    color: var(--text-primary);
+    border-radius: 8px;
+    padding: 8px 20px;
+    transition: all 0.2s;
+}
+
+.btn-custom:hover {
+    background: var(--border-color);
+    color: var(--text-primary);
+}
+
+.btn-primary-custom {
+    background: var(--accent-blue);
+    border: none;
+    color: #fff;
+    border-radius: 8px;
+    padding: 10px 30px;
+    font-weight: 500;
+    transition: all 0.2s;
+}
+
+.btn-primary-custom:hover {
+    background: #4a8ed9;
+    color: #fff;
+    transform: translateY(-1px);
+}
+
+.btn-success-custom {
+    background: var(--accent-green);
+    border: none;
+    color: #fff;
+    border-radius: 8px;
+    padding: 10px 30px;
+    font-weight: 500;
+    transition: all 0.2s;
+}
+
+.btn-success-custom:hover {
+    background: #36a33c;
+    color: #fff;
+    transform: translateY(-1px);
+}
+
+.badge-custom {
+    background: var(--border-color);
+    color: var(--text-secondary);
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-weight: 500;
+}
+
+.badge-custom.active {
+    background: var(--accent-blue);
+    color: #fff;
+}
+
+.json-preview {
+    background: var(--bg-input);
+    padding: 12px 16px;
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+    font-family: 'JetBrains Mono', 'Consolas', monospace;
+    font-size: 12px;
+    color: var(--text-secondary);
+    margin-top: 10px;
+    max-height: 150px;
+    overflow: auto;
+}
+
+.json-preview code {
+    color: var(--text-secondary);
+}
+
+.alert-success {
+    background: rgba(63, 185, 80, 0.15);
+    border: 1px solid var(--accent-green);
+    color: var(--accent-green);
+}
+
+.alert-danger {
+    background: rgba(248, 81, 73, 0.15);
+    border: 1px solid var(--accent-red);
+    color: var(--accent-red);
+}
+
+.progress-bar-custom {
+    background: var(--bg-input);
+    border-radius: 20px;
+    padding: 4px;
+    border: 1px solid var(--border-color);
+    margin-bottom: 15px;
+}
+
+.progress-bar-fill {
+    background: var(--accent-blue);
+    height: 6px;
+    border-radius: 20px;
+    transition: width 0.3s ease;
+}
+
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--bg-dark);
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--border-color);
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--text-secondary);
+}
+
+.file-upload-wrapper {
+    position: relative;
+    overflow: hidden;
+    display: inline-block;
+}
+
+.file-upload-wrapper input[type="file"] {
+    position: absolute;
+    left: 0;
+    top: 0;
+    opacity: 0;
+    width: 100%;
+    height: 100%;
+    cursor: pointer;
+}
+
+.btn-outline-secondary {
+    border-color: var(--border-color);
+    color: var(--text-secondary);
+}
+
+.btn-outline-secondary:hover {
+    background: var(--border-color);
+    color: var(--text-primary);
+}
+
+.btn-outline-secondary i {
+    color: var(--text-secondary);
+}
+
+@media (max-width: 768px) {
+    .hero-navigation {
+        flex-direction: column;
+        gap: 15px;
+    }
+    .hero-info {
+        width: 100%;
+        justify-content: center;
+    }
+    .card {
+        padding: 20px;
+    }
+}
+
+/* === ТЁМНАЯ ТЕМА BOOTSTRAP === */
+
+/* Подзаголовок с именем героя */
+.hero-subtitle {
+    font-size: 0.55em;
+    color: var(--text-secondary);
+    display: block;
+    margin-top: 6px;
+    font-weight: 400;
+    letter-spacing: 0.5px;
+}
+
+/* Переопределение Bootstrap для тёмной темы */
+[data-bs-theme="dark"] .form-control,
+[data-bs-theme="dark"] .form-select {
+    background-color: var(--bg-input) !important;
+    border-color: var(--border-color) !important;
+    color: var(--text-primary) !important;
+}
+
+[data-bs-theme="dark"] .form-control:focus,
+[data-bs-theme="dark"] .form-select:focus {
+    background-color: var(--bg-input) !important;
+    border-color: var(--accent-blue) !important;
+    color: var(--text-primary) !important;
+    box-shadow: 0 0 0 3px rgba(88, 166, 255, 0.15) !important;
+}
+
+[data-bs-theme="dark"] .form-control::placeholder {
+    color: var(--text-secondary) !important;
+    opacity: 0.7;
+}
+
+[data-bs-theme="dark"] .form-select option {
+    background-color: var(--bg-card);
+    color: var(--text-primary);
+}
+
+[data-bs-theme="dark"] textarea.form-control {
+    background-color: var(--bg-input) !important;
+    color: var(--text-primary) !important;
+}
+
+/* Кнопки в тёмной теме */
+[data-bs-theme="dark"] .btn-outline-secondary {
+    --bs-btn-color: var(--text-secondary);
+    --bs-btn-border-color: var(--border-color);
+    --bs-btn-hover-color: var(--text-primary);
+    --bs-btn-hover-bg: var(--border-color);
+    --bs-btn-hover-border-color: var(--border-color);
+    --bs-btn-active-bg: var(--border-color);
+    --bs-btn-active-border-color: var(--border-color);
+    --bs-btn-disabled-color: var(--text-secondary);
+    --bs-btn-disabled-border-color: var(--border-color);
+}
+
+/* Убираем белые вспышки Bootstrap */
+[data-bs-theme="dark"] .form-control:-webkit-autofill,
+[data-bs-theme="dark"] .form-control:-webkit-autofill:hover,
+[data-bs-theme="dark"] .form-control:-webkit-autofill:focus {
+    -webkit-text-fill-color: var(--text-primary);
+    -webkit-box-shadow: 0 0 0px 1000px var(--bg-input) inset;
+    transition: background-color 5000s ease-in-out 0s;
+}
+
+/* Адаптив подзаголовка */
+@media (max-width: 768px) {
+    .hero-subtitle {
+        font-size: 0.5em;
+    }
+}

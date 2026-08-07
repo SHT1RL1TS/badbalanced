@@ -1,0 +1,14 @@
+# --- Исключение для Adminer ---
+<Files "adminer.php">
+    Header unset Content-Security-Policy
+</Files>
+# ------------------------------
+RewriteEngine On
+RewriteBase /cd-project/butbalanced/client/
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+
+RewriteRule ^(.+)$ index.php [QSA,L]
+
+Header set Content-Security-Policy "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://unpkg.com;"
