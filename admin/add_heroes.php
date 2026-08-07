@@ -179,7 +179,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
     }
 }
 
-// Загружаем данные текущего героя
 $current_hero = null;
 $roles_data = null;
 $stats_data = null;
