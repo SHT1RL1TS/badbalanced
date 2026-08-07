@@ -1,6 +1,5 @@
 <?php
 $heroes = getAllHeroes($db);
-// Обработка POST запроса
 $message = '';
 $current_index = isset($_POST['current_index']) ? (int)$_POST['current_index'] : 0;
 $hero_id = isset($heroes[$current_index]['id_hero']) ? $heroes[$current_index]['id_hero'] : 0;
@@ -15,7 +14,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
             $description_hero = $_POST['description_hero'] ?? '';
             $full_description = $_POST['full_description'] ?? '';
             $attack_type = (int)($_POST['attack_type'] ?? 0);
-            $difficulty = (int)($_POST['difficulty'] ?? 0);
+            $complexity = (int)($_POST['complexity'] ?? 0);
             $hp = (float)($_POST['hp'] ?? 0);
             $mana = (float)($_POST['mana'] ?? 0);
             $hp_gain = (float)($_POST['hp_gain'] ?? 0);
@@ -51,8 +50,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
             $stats_json = json_encode($stats, JSON_UNESCAPED_UNICODE);
 
             // Обработка загрузки иконки
-            $icon_url_hero = $_POST['icon_url_hero'] ?? '';
-            $thumbnail_url_hero = $_POST['thumbnail_url_hero'] ?? '';
+            $icon_hero = $_POST['icon_url_hero'] ?? '';
+            $crop_hero = $_POST['crop_hero'] ?? '';
 
             if (isset($_FILES['icon_file']) && $_FILES['icon_file']['error'] === UPLOAD_ERR_OK) {
                 $upload_dir = $src . 'heroes/';
@@ -62,11 +61,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                 $filename = basename($_FILES['icon_file']['name']);
                 $target_file = $upload_dir . $filename;
                 if (move_uploaded_file($_FILES['icon_file']['tmp_name'], $target_file)) {
-                    $icon_url_hero = $filename;
+                    $icon_hero = $filename;
                 }
             }
 
-            if (isset($_FILES['thumbnail_file']) && $_FILES['thumbnail_file']['error'] === UPLOAD_ERR_OK) {
+            if (isset($_FILES['crop_hero']) && $_FILES['thumbnail_file']['error'] === UPLOAD_ERR_OK) {
                 $upload_dir = $src . 'heroes/crops/';
                 if (!is_dir($upload_dir)) {
                     mkdir($upload_dir, 0777, true);
@@ -74,10 +73,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                 $filename = basename($_FILES['thumbnail_file']['name']);
                 $target_file = $upload_dir . $filename;
                 if (move_uploaded_file($_FILES['thumbnail_file']['tmp_name'], $target_file)) {
-                    $thumbnail_url_hero = $filename;
+                    $crop_hero = $filename;
                 }
             }
-
             // Проверяем существует ли герой
             $check_query = "SELECT id_hero FROM heroes WHERE id_hero = :id_hero";
             $check_stmt = $db->prepare($check_query);
@@ -86,32 +84,61 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
             $exists = $check_stmt->fetch();
 
             if ($exists) {
-                $query = "UPDATE heroes SET
-                    name_hero = :name_hero,
-                    description_hero = :description_hero,
-                    full_description = :full_description,
-                    attack_type = :attack_type,
-                    difficulty = :difficulty,
-                    hp = :hp,
-                    mana = :mana,
-                    hp_gain = :hp_gain,
-                    mana_gain = :mana_gain,
-                    attribute_id = :attribute_id,
-                    roles = :roles,
-                    stats = :stats,
-                    icon_url_hero = :icon_url_hero,
-                    thumbnail_url_hero = :thumbnail_url_hero
-                    WHERE id_hero = :id_hero";
+                $query = "
+                    UPDATE heroes SET
+                        name_hero = :name_hero,
+                        attribute_id = :attribute_id,
+                        complexity = :complexity
+                    WHERE id_hero = :id_hero;
+                    UPDATE heroes_stats SET
+                        description_hero = :description_hero,
+                        full_description = :full_description,
+                        attack_type = :attack_type,
+                        hp = :hp,
+                        mana = :mana,
+                        hp_gain = :hp_gain,
+                        mana_gain = :mana_gain,
+                        roles = :roles,
+                        stats = :stats,
+                        icon_url_hero = :icon_url_hero,
+                        crop_hero = :crop_hero
+                    WHERE id_hero = :id_hero;";
             } else {
-                $query = "INSERT INTO heroes (
-                    id_hero, name_hero, description_hero, full_description,
-                    attack_type, difficulty, hp, mana, hp_gain, mana_gain,
-                    attribute_id, roles, stats, icon_url_hero, thumbnail_url_hero
-                ) VALUES (
-                    :id_hero, :name_hero, :description_hero, :full_description,
-                    :attack_type, :difficulty, :hp, :mana, :hp_gain, :mana_gain,
-                    :attribute_id, :roles, :stats, :icon_url_hero, :thumbnail_url_hero
-                )";
+                $query = "
+                    INSERT INTO heroes (
+                        attribute_id,
+                        name_hero,
+                        icon_hero,
+                        complexity
+                    ) VALUES (
+                        :attribute_id,
+                        :name_hero,
+                        :icon_hero,
+                        :complexity
+                    )
+                    INSERT INTO heroes_stats (
+                        id_hero,
+                        description_hero,
+                        full_description,
+                        attack_type,
+                        hp,
+                        mana,
+                        hp_gain,
+                        mana_gain,
+                        roles,
+                        stats
+                    ) VALUES (
+                        :id_hero,
+                        :description_hero,
+                        :full_description,
+                        :attack_type,
+                        :hp,
+                        :mana,
+                        :hp_gain,
+                        :mana_gain,
+                        :stats
+                        :roles,
+                    )";
             }
 
             $stmt = $db->prepare($query);
@@ -120,7 +147,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
             $stmt->bindParam(':description_hero', $description_hero);
             $stmt->bindParam(':full_description', $full_description);
             $stmt->bindParam(':attack_type', $attack_type);
-            $stmt->bindParam(':difficulty', $difficulty);
+            $stmt->bindParam(':complexity', $complexity);
             $stmt->bindParam(':hp', $hp);
             $stmt->bindParam(':mana', $mana);
             $stmt->bindParam(':hp_gain', $hp_gain);
@@ -128,8 +155,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
             $stmt->bindParam(':attribute_id', $attribute_id);
             $stmt->bindParam(':roles', $roles_json);
             $stmt->bindParam(':stats', $stats_json);
-            $stmt->bindParam(':icon_url_hero', $icon_url_hero);
-            $stmt->bindParam(':thumbnail_url_hero', $thumbnail_url_hero);
+            $stmt->bindParam(':icon_url_hero', $icon_hero);
+            $stmt->bindParam(':crop_hero', $crop_hero);
             $stmt->execute();
 
             // Обновляем список героев
@@ -164,8 +191,9 @@ if ($hero_id > 0) {
         $stmt->bindParam(':hero_id', $hero_id);
         $stmt->execute();
         $hero_data = $stmt->fetch(PDO::FETCH_ASSOC);
-        $roles_data = json_decode($hero_data['roles'], true);
-        $stats_data = json_decode($hero_data['stats'], true);
+        print_r($hero_data);
+        // $roles_data = json_decode($hero_data['roles'], true);
+        // $stats_data = json_decode($hero_data['stats'], true);
     }
 }
 
@@ -274,11 +302,11 @@ $page_hero_name = ($current_hero && !empty($current_hero['name_hero'])) ? $curre
                         </select>
                     </div>
                     <div class="col-md-6 mb-3">
-                        <label for="difficulty" class="form-label">Сложность</label>
-                        <select class="form-select" id="difficulty" name="difficulty">
-                            <option value="1" <?php echo (($current_hero['difficulty'] ?? '1') == '1') ? 'selected' : ''; ?>>⭐ Легкий</option>
-                            <option value="2" <?php echo (($current_hero['difficulty'] ?? '1') == '2') ? 'selected' : ''; ?>>⭐⭐ Средний</option>
-                            <option value="3" <?php echo (($current_hero['difficulty'] ?? '1') == '3') ? 'selected' : ''; ?>>⭐⭐⭐ Сложный</option>
+                        <label for="complexity" class="form-label">Сложность</label>
+                        <select class="form-select" id="complexity" name="complexity">
+                            <option value="1" <?php echo (($current_hero['complexity'] ?? '1') == '1') ? 'selected' : ''; ?>>⭐ Легкий</option>
+                            <option value="2" <?php echo (($current_hero['complexity'] ?? '2') == '2') ? 'selected' : ''; ?>>⭐⭐ Средний</option>
+                            <option value="3" <?php echo (($current_hero['complexity'] ?? '3') == '3') ? 'selected' : ''; ?>>⭐⭐⭐ Сложный</option>
                         </select>
                     </div>
                     <div class="col-12 mb-3">
@@ -422,8 +450,8 @@ $page_hero_name = ($current_hero && !empty($current_hero['name_hero'])) ? $curre
                             value="<?php echo htmlspecialchars($current_hero['icon_hero'] ?? ''); ?>">
                         <?php if ($current_hero && $current_hero['icon_hero']): ?>
                             <div class="mt-2">
-                                <img src="../CSS/icons/<?php echo htmlspecialchars($current_hero['icon_hero']); ?>"
-                                    style="max-width: 60px; max-height: 60px; border-radius: 8px; border: 1px solid var(--border-color);">
+                                <img src="<?= $src ?>/heroes/<?php echo htmlspecialchars($current_hero['icon_hero']); ?>"
+                                    style="max-width: 260px; border-radius: 8px; border: 1px solid var(--border-color);">
                             </div>
                         <?php endif; ?>
                     </div>
@@ -436,13 +464,13 @@ $page_hero_name = ($current_hero && !empty($current_hero['name_hero'])) ? $curre
                             <input type="file" class="form-control" id="thumbnail_file" name="thumbnail_file" accept="image/*">
                         </div>
                         <small class="text-secondary">Или введите URL ниже</small>
-                        <input type="text" class="form-control mt-2" id="thumbnail_url_hero" name="thumbnail_url_hero"
+                        <input type="text" class="form-control mt-2" id="crop_hero" name="crop_hero"
                             placeholder="Или URL миниатюры"
-                            value="<?php echo htmlspecialchars($current_hero['thumbnail_url_hero'] ?? ''); ?>">
-                        <?php if ($current_hero && $current_hero['thumbnail_url_hero']): ?>
+                            value="<?php echo htmlspecialchars($current_hero['icon_hero'] ?? ''); ?>">
+                        <?php if ($current_hero && $current_hero['icon_hero']): ?>
                             <div class="mt-2">
-                                <img src="../CSS/thumbnails/<?php echo htmlspecialchars($current_hero['thumbnail_url_hero']); ?>"
-                                    style="max-width: 120px; max-height: 60px; border-radius: 8px; border: 1px solid var(--border-color); object-fit: cover;">
+                                <img src="<?= $src ?>/heroes/crops/<?php echo htmlspecialchars($current_hero['icon_hero']); ?>"
+                                    style="max-width: 260px; border-radius: 8px; border: 1px solid var(--border-color); object-fit: cover;">
                             </div>
                         <?php endif; ?>
                     </div>
