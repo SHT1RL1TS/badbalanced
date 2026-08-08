@@ -3,8 +3,8 @@
 // ========== GET функции ==========
 
 function getAllHeroes($db) {
-    $query = "SELECT id_hero, name_hero, icon_hero, attribute_id 
-              FROM heroes 
+    $query = "SELECT *
+              FROM heroes
               ORDER BY name_hero";
     $stmt = $db->prepare($query);
     $stmt->execute();
@@ -12,7 +12,7 @@ function getAllHeroes($db) {
 }
 
 function getAllSkills($db) {
-    $query = "SELECT s.id_skill, s.name_skill, s.description_skill, s.image_url_skill, 
+    $query = "SELECT s.id_skill, s.name_skill, s.description_skill, s.image_url_skill,
                      h.name_hero as hero_name, p.name as patch_name
               FROM skills s
               LEFT JOIN heroes h ON s.id_hero = h.id_hero
@@ -37,7 +37,7 @@ function getHeroSkills($db, $hero_id) {
 }
 
 function getPatchHeroes($db, $patch_id) {
-    $query = "SELECT h.id_hero, h.name_hero, h.description_hero, h.stats_hero, 
+    $query = "SELECT h.id_hero, h.name_hero, h.description_hero, h.stats_hero,
                      h.icon_url_hero, h.thumbnail_url_hero, a.attribute_name
               FROM heroes h
               LEFT JOIN attribut a ON h.attribute_id = a.attribute_id
@@ -63,8 +63,8 @@ function getPatchSkills($db, $patch_id) {
 }
 
 function getAllPatches($db) {
-    $query = "SELECT id, name, description, is_major, patch_img_url 
-              FROM pathes 
+    $query = "SELECT id, name, description, is_major, patch_img_url
+              FROM pathes
               ORDER BY id DESC";
     $stmt = $db->prepare($query);
     $stmt->execute();
@@ -72,8 +72,8 @@ function getAllPatches($db) {
 }
 
 function getPatchById($db, $patch_id) {
-    $query = "SELECT id, name, description, is_major, patch_img_url 
-              FROM pathes 
+    $query = "SELECT id, name, description, is_major, patch_img_url
+              FROM pathes
               WHERE id = :patch_id";
     $stmt = $db->prepare($query);
     $stmt->bindParam(':patch_id', $patch_id);
@@ -89,7 +89,7 @@ function getAttributes($db) {
 }
 
 function getHeroById($db, $hero_id) {
-    $query = "SELECT h.id_hero, h.name_hero, h.description_hero, h.stats_hero, 
+    $query = "SELECT h.id_hero, h.name_hero, h.description_hero, h.stats_hero,
                      h.icon_url_hero, h.thumbnail_url_hero, h.attribute_id, a.attribute_name,
                      p.id as patch_id, p.name as patch_name
               FROM heroes h

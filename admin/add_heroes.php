@@ -13,7 +13,7 @@ $hero_id = isset($heroes[$current_index]['id_hero']) ? $heroes[$current_index]['
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
     $action = $_POST['action'];
 
-    if ($action === 'save') {
+    if ($action === 'save' || $action === 'save_and_next') {
         try {
             $hero_id = (int)$_POST['hero_id'];
             $name_hero = $_POST['name_hero'] ?? '';
@@ -21,10 +21,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
             $full_description = $_POST['full_description'] ?? '';
             $attack_type = (int)($_POST['attack_type'] ?? 0);
             $complexity = (int)($_POST['complexity'] ?? 0);
-            $hp = (float)($_POST['hp'] ?? 0);
-            $mana = (float)($_POST['mana'] ?? 0);
-            $hp_gain = (float)($_POST['hp_gain'] ?? 0);
-            $mana_gain = (float)($_POST['mana_gain'] ?? 0);
             $attribute_id = (int)($_POST['attribute_id'] ?? 0);
 
             // Собираем JSON для roles
@@ -56,7 +52,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
             $stats_json = json_encode($stats, JSON_UNESCAPED_UNICODE);
 
             // Обработка загрузки иконки
-            $icon_hero = $_POST['icon_url_hero'] ?? '';
+            $icon_hero = $_POST['icon_hero'] ?? '';
             $crop_hero = $_POST['crop_hero'] ?? '';
 
             if (isset($_FILES['icon_file']) && $_FILES['icon_file']['error'] === UPLOAD_ERR_OK) {
@@ -64,24 +60,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                 if (!is_dir($upload_dir)) {
                     mkdir($upload_dir, 0777, true);
                 }
-                $filename = basename($_FILES['icon_file']['name']);
+                $ext = pathinfo($_FILES['icon_file']['name'], PATHINFO_EXTENSION);
+                $safe_name = preg_replace('/[^a-zA-Z0-9_-]/u', '_', $name_hero);
+                $filename = $safe_name . '.' . strtolower($ext);
                 $target_file = $upload_dir . $filename;
                 if (move_uploaded_file($_FILES['icon_file']['tmp_name'], $target_file)) {
                     $icon_hero = $filename;
                 }
             }
 
-            if (isset($_FILES['crop_hero']) && $_FILES['thumbnail_file']['error'] === UPLOAD_ERR_OK) {
+            if (isset($_FILES['thumbnail_file']) && $_FILES['thumbnail_file']['error'] === UPLOAD_ERR_OK) {
                 $upload_dir = $src . 'heroes/crops/';
                 if (!is_dir($upload_dir)) {
                     mkdir($upload_dir, 0777, true);
                 }
-                $filename = basename($_FILES['thumbnail_file']['name']);
+                $ext = pathinfo($_FILES['thumbnail_file']['name'], PATHINFO_EXTENSION);
+                $safe_name = preg_replace('/[^a-zA-Z0-9_-]/u', '_', $name_hero);
+                $filename = $safe_name . '.' . strtolower($ext);
                 $target_file = $upload_dir . $filename;
                 if (move_uploaded_file($_FILES['thumbnail_file']['tmp_name'], $target_file)) {
                     $crop_hero = $filename;
                 }
             }
+
             // Проверяем существует ли герой
             $check_query = "SELECT id_hero FROM heroes WHERE id_hero = :id_hero";
             $check_stmt = $db->prepare($check_query);
@@ -90,85 +91,104 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
             $exists = $check_stmt->fetch();
 
             if ($exists) {
+                // UPDATE heroes
                 $query = "
                     UPDATE heroes SET
                         name_hero = :name_hero,
                         attribute_id = :attribute_id,
+                        icon_hero = :icon_hero,
+                        crop_hero = :crop_hero,
                         complexity = :complexity
-                    WHERE id_hero = :id_hero;
+                    WHERE id_hero = :id_hero";
+                $stmt = $db->prepare($query);
+                $stmt->bindParam(':id_hero', $hero_id);
+                $stmt->bindParam(':name_hero', $name_hero);
+                $stmt->bindParam(':attribute_id', $attribute_id);
+                $stmt->bindParam(':icon_hero', $icon_hero);
+                $stmt->bindParam(':crop_hero', $crop_hero);
+                $stmt->bindParam(':complexity', $complexity);
+                $stmt->execute();
+
+                // UPDATE heroes_stats
+                $query2 = "
                     UPDATE heroes_stats SET
                         description_hero = :description_hero,
                         full_description = :full_description,
                         attack_type = :attack_type,
-                        hp = :hp,
-                        mana = :mana,
-                        hp_gain = :hp_gain,
-                        mana_gain = :mana_gain,
                         roles = :roles,
-                        stats = :stats,
-                        icon_url_hero = :icon_url_hero,
-                        crop_hero = :crop_hero
-                    WHERE id_hero = :id_hero;";
+                        stats = :stats
+                    WHERE id_hero = :id_hero";
+                $stmt2 = $db->prepare($query2);
+                $stmt2->bindParam(':id_hero', $hero_id);
+                $stmt2->bindParam(':description_hero', $description_hero);
+                $stmt2->bindParam(':full_description', $full_description);
+                $stmt2->bindParam(':attack_type', $attack_type);
+                $stmt2->bindParam(':roles', $roles_json);
+                $stmt2->bindParam(':stats', $stats_json);
+                $stmt2->bindParam(':icon_hero', $icon_hero);
+                $stmt2->bindParam(':crop_hero', $crop_hero);
+                $stmt2->execute();
             } else {
-                $query = "
-                    INSERT INTO heroes (
-                        attribute_id,
-                        name_hero,
-                        icon_hero,
-                        complexity
-                    ) VALUES (
-                        :attribute_id,
-                        :name_hero,
-                        :icon_hero,
-                        :complexity
-                    )
-                    INSERT INTO heroes_stats (
-                        id_hero,
-                        description_hero,
-                        full_description,
-                        attack_type,
-                        hp,
-                        mana,
-                        hp_gain,
-                        mana_gain,
-                        roles,
-                        stats
-                    ) VALUES (
-                        :id_hero,
-                        :description_hero,
-                        :full_description,
-                        :attack_type,
-                        :hp,
-                        :mana,
-                        :hp_gain,
-                        :mana_gain,
-                        :stats
-                        :roles,
-                    )";
-            }
+                // INSERT heroes (без id_hero — автоинкремент)
+                $query = "INSERT INTO heroes (
+                    attribute_id,
+                    name_hero,
+                    icon_hero,
+                    crop_hero,
+                    complexity
+                ) VALUES (
+                    :attribute_id,
+                    :name_hero,
+                    :icon_hero,
+                    :crop_hero,
+                    :complexity
+                ) RETURNING id_hero";
+                $stmt = $db->prepare($query);
+                $stmt->bindParam(':attribute_id', $attribute_id);
+                $stmt->bindParam(':name_hero', $name_hero);
+                $stmt->bindParam(':icon_hero', $icon_hero);
+                $stmt->bindParam(':crop_hero', $crop_hero);
+                $stmt->bindParam(':complexity', $complexity);
+                $stmt->execute();
+                $new_hero_id = $stmt->fetchColumn();
 
-            $stmt = $db->prepare($query);
-            $stmt->bindParam(':id_hero', $hero_id);
-            $stmt->bindParam(':name_hero', $name_hero);
-            $stmt->bindParam(':description_hero', $description_hero);
-            $stmt->bindParam(':full_description', $full_description);
-            $stmt->bindParam(':attack_type', $attack_type);
-            $stmt->bindParam(':complexity', $complexity);
-            $stmt->bindParam(':hp', $hp);
-            $stmt->bindParam(':mana', $mana);
-            $stmt->bindParam(':hp_gain', $hp_gain);
-            $stmt->bindParam(':mana_gain', $mana_gain);
-            $stmt->bindParam(':attribute_id', $attribute_id);
-            $stmt->bindParam(':roles', $roles_json);
-            $stmt->bindParam(':stats', $stats_json);
-            $stmt->bindParam(':icon_url_hero', $icon_hero);
-            $stmt->bindParam(':crop_hero', $crop_hero);
-            $stmt->execute();
+                // INSERT heroes_stats
+                $query2 = "INSERT INTO heroes_stats (
+                    id_hero,
+                    description_hero,
+                    full_description,
+                    attack_type,
+                    roles,
+                    stats
+                ) VALUES (
+                    :id_hero,
+                    :description_hero,
+                    :full_description,
+                    :attack_type,
+                    :roles,
+                    :stats
+                )";
+                $stmt2 = $db->prepare($query2);
+                $stmt2->bindParam(':id_hero', $new_hero_id);
+                $stmt2->bindParam(':description_hero', $description_hero);
+                $stmt2->bindParam(':full_description', $full_description);
+                $stmt2->bindParam(':attack_type', $attack_type);
+                $stmt2->bindParam(':roles', $roles_json);
+                $stmt2->bindParam(':stats', $stats_json);
+                $stmt2->execute();
+
+                $hero_id = $new_hero_id;
+            }
 
             // Обновляем список героев
             $heroes = getAllHeroes($db);
 
             $message = '<div class="alert alert-success">✅ Герой #' . $hero_id . ' успешно сохранен!</div>';
+
+            if ($action === 'save_and_next') {
+                $current_index = min($current_index + 1, count($heroes) - 1);
+                $hero_id = isset($heroes[$current_index]['id_hero']) ? $heroes[$current_index]['id_hero'] : 0;
+            }
 
         } catch (PDOException $e) {
             $message = '<div class="alert alert-danger">❌ Ошибка: ' . $e->getMessage() . '</div>';
@@ -196,13 +216,10 @@ if ($hero_id > 0) {
         $stmt->bindParam(':hero_id', $hero_id);
         $stmt->execute();
         $hero_data = $stmt->fetch(PDO::FETCH_ASSOC);
-        print_r($hero_data);
+
         if ($hero_data) {
-            $roles_data = json_decode($hero_data['roles'], true);
-            $stats_data = json_decode($hero_data['stats'], true);
-        } else {
-            $roles_data = null;
-            $stats_data = null;
+            $roles_data = json_decode($hero_data['roles'] ?? '{}', true);
+            $stats_data = json_decode($hero_data['stats'] ?? '{}', true);
         }
     }
 }
@@ -212,11 +229,7 @@ $total_heroes = count($heroes);
 
 $page_hero_name = ($current_hero && !empty($current_hero['name_hero'])) ? $current_hero['name_hero'] : 'Новый герой';
 ?>
-<script>
-    // Активируем тёмную тему Bootstrap
-    document.documentElement.setAttribute('data-bs-theme', 'dark');
-</script>
-
+<script>document.documentElement.setAttribute('data-bs-theme', 'dark');</script>
 <br>
 <br>
 <br>
@@ -330,33 +343,6 @@ $page_hero_name = ($current_hero && !empty($current_hero['name_hero'])) ? $curre
                 </div>
             </div>
 
-            <!-- Характеристики -->
-            <div class="form-section">
-                <h5 class="section-title"><i class="bi bi-bar-chart"></i> Характеристики</h5>
-                <div class="row">
-                    <div class="col-md-3 mb-3">
-                        <label for="hp" class="form-label">HP</label>
-                        <input type="number" step="0.01" class="form-control" id="hp" name="hp"
-                            value="<?php echo htmlspecialchars($current_hero['hp'] ?? ''); ?>">
-                    </div>
-                    <div class="col-md-3 mb-3">
-                        <label for="mana" class="form-label">Mana</label>
-                        <input type="number" step="0.01" class="form-control" id="mana" name="mana"
-                            value="<?php echo htmlspecialchars($current_hero['mana'] ?? ''); ?>">
-                    </div>
-                    <div class="col-md-3 mb-3">
-                        <label for="hp_gain" class="form-label">HP Gain</label>
-                        <input type="number" step="0.01" class="form-control" id="hp_gain" name="hp_gain"
-                            value="<?php echo htmlspecialchars($current_hero['hp_gain'] ?? ''); ?>">
-                    </div>
-                    <div class="col-md-3 mb-3">
-                        <label for="mana_gain" class="form-label">Mana Gain</label>
-                        <input type="number" step="0.01" class="form-control" id="mana_gain" name="mana_gain"
-                            value="<?php echo htmlspecialchars($current_hero['mana_gain'] ?? ''); ?>">
-                    </div>
-                </div>
-            </div>
-
             <!-- Роли -->
             <div class="form-section">
                 <h5 class="section-title"><i class="bi bi-tags"></i> Роли (JSON)</h5>
@@ -378,7 +364,7 @@ $page_hero_name = ($current_hero && !empty($current_hero['name_hero'])) ? $curre
                     <div class="col-md-4 mb-2">
                         <label for="<?php echo $field; ?>" class="form-label"><?php echo $label; ?></label>
                         <input type="number" class="form-control" id="<?php echo $field; ?>" name="<?php echo $field; ?>"
-                            value="<?php echo htmlspecialchars($roles_data[str_replace('', '', $field)] ?? 0); ?>" min="0" max="5">
+                            value="<?php echo htmlspecialchars($roles_data[$field] ?? 0); ?>" min="0" max="5">
                     </div>
                     <?php endforeach; ?>
                 </div>
@@ -429,11 +415,11 @@ $page_hero_name = ($current_hero && !empty($current_hero['name_hero'])) ? $curre
                     <div class="col-md-4 mb-3">
                         <label for="turn_rate" class="form-label">Скорость вращения</label>
                         <input type="number" step="0.1" class="form-control" id="turn_rate" name="turn_rate"
-                            value="<?php echo htmlspecialchars($stats_data['скорость_вращения'] ?? ''); ?>">
+                            value="<?php echo htmlspecialchars($stats_data['turn_rate'] ?? ''); ?>">
                     </div>
                     <div class="col-md-4 mb-3">
                         <label for="vision" class="form-label">Дальность видимости</label>
-                        <input type="text" pattern="{4}[0-9]/{4}[0-9]" class="form-control" id="vision" name="vision"
+                        <input type="text" class="form-control" id="vision" name="vision"
                             value="<?php echo htmlspecialchars($stats_data['vision'] ?? ''); ?>" placeholder="1800/800">
                     </div>
                 </div>
@@ -460,7 +446,7 @@ $page_hero_name = ($current_hero && !empty($current_hero['name_hero'])) ? $curre
                             value="<?php echo htmlspecialchars($current_hero['icon_hero'] ?? ''); ?>">
                         <?php if ($current_hero && $current_hero['icon_hero']): ?>
                             <div class="mt-2">
-                                <img src="<?= $src ?>/heroes/<?php echo htmlspecialchars($current_hero['icon_hero']); ?>"
+                                <img src="<?= $src ?>heroes/<?php echo htmlspecialchars($current_hero['icon_hero']); ?>"
                                     style="max-width: 260px; border-radius: 8px; border: 1px solid var(--border-color);">
                             </div>
                         <?php endif; ?>
@@ -476,10 +462,10 @@ $page_hero_name = ($current_hero && !empty($current_hero['name_hero'])) ? $curre
                         <small class="text-secondary">Или введите URL ниже</small>
                         <input type="text" class="form-control mt-2" id="crop_hero" name="crop_hero"
                             placeholder="Или URL миниатюры"
-                            value="<?php echo htmlspecialchars($current_hero['icon_hero'] ?? ''); ?>">
-                        <?php if ($current_hero && $current_hero['icon_hero']): ?>
+                            value="<?php echo htmlspecialchars($current_hero['crop_hero'] ?? ''); ?>">
+                        <?php if ($current_hero && $current_hero['crop_hero']): ?>
                             <div class="mt-2">
-                                <img src="<?= $src ?>/heroes/crops/<?php echo htmlspecialchars($current_hero['icon_hero']); ?>"
+                                <img src="<?= $src ?>heroes/crops/<?php echo htmlspecialchars($current_hero['crop_hero']); ?>"
                                     style="max-width: 260px; border-radius: 8px; border: 1px solid var(--border-color); object-fit: cover;">
                             </div>
                         <?php endif; ?>
@@ -507,8 +493,8 @@ document.getElementById('name_hero').addEventListener('input', function(e) {
     document.getElementById('heroNameInTitle').textContent = name;
 });
 
-// Обновление JSON превью
-document.querySelectorAll('[name^=""]').forEach(input => {
+// Обновление JSON превью ролей
+document.querySelectorAll('#core, #support, #burst, #control, #jungle, #tank, #escape, #siege, #initiation').forEach(input => {
     input.addEventListener('input', updateRolesPreview);
 });
 function updateRolesPreview() {
@@ -526,7 +512,8 @@ function updateRolesPreview() {
     document.getElementById('rolesPreview').textContent = JSON.stringify(roles, null, 2);
 }
 
-document.querySelectorAll('[name^=""]').forEach(input => {
+// Обновление JSON превью статов
+document.querySelectorAll('#damage, #attack_interval, #range, #projectile_speed, #armor, #magic_resist, #move_speed, #turn_rate, #vision').forEach(input => {
     input.addEventListener('input', updateStatsPreview);
 });
 function updateStatsPreview() {
