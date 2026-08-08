@@ -1,5 +1,5 @@
-# BadBalanced
-это сайт для кастомного режима 'BadBalanced' в Dota 2. создан в целях введения истории изменения
+# ButBalanced
+это сайт для кастомного режима 'ButBalanced' в Dota 2. создан в целях введения истории изменения
 ссылка на проект:
 https://steamcommunity.com/sharedfiles/filedetails/?id=3699416108
 
