@@ -125,8 +125,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                 $stmt2->bindParam(':attack_type', $attack_type);
                 $stmt2->bindParam(':roles', $roles_json);
                 $stmt2->bindParam(':stats', $stats_json);
-                $stmt2->bindParam(':icon_hero', $icon_hero);
-                $stmt2->bindParam(':crop_hero', $crop_hero);
                 $stmt2->execute();
             } else {
                 // INSERT heroes (без id_hero — автоинкремент)
