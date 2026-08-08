@@ -14,6 +14,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
     $action = $_POST['action'];
 
     if ($action === 'save' || $action === 'save_and_next') {
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $debug = [];
+            $debug['POST'] = $_POST;
+            $debug['FILES'] = $_FILES;
+            $debug['DOCUMENT_ROOT'] = $_SERVER['DOCUMENT_ROOT'];
+            $debug['src'] = $src;
+            $debug['upload_base'] = $_SERVER['DOCUMENT_ROOT'] . $src;
+            $debug['upload_base_exists'] = is_dir($_SERVER['DOCUMENT_ROOT'] . $src);
+            file_put_contents('C:\\xampp\\htdocs\\cd-project\\butbalanced\\debug.log', print_r($debug, true));
+        }
         try {
             $hero_id = (int)$_POST['hero_id'];
             $name_hero = $_POST['name_hero'] ?? '';
@@ -23,7 +33,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
             $complexity = (int)($_POST['complexity'] ?? 0);
             $attribute_id = (int)($_POST['attribute_id'] ?? 0);
 
-            // Собираем JSON для roles
+            // JSON роли
             $roles = [
                 'core' => (int)($_POST['core'] ?? 0),
                 'support' => (int)($_POST['support'] ?? 0),
@@ -37,7 +47,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
             ];
             $roles_json = json_encode($roles, JSON_UNESCAPED_UNICODE);
 
-            // Собираем JSON для stats
+            // JSON статы
             $stats = [
                 'damage' => $_POST['damage'] ?? '',
                 'attack_interval' => (float)($_POST['attack_interval'] ?? 0),
@@ -51,42 +61,62 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
             ];
             $stats_json = json_encode($stats, JSON_UNESCAPED_UNICODE);
 
-            // Обработка загрузки иконки
+            // --- Обработка загрузки файлов ---
             $icon_hero = $_POST['icon_hero'] ?? '';
             $crop_hero = $_POST['crop_hero'] ?? '';
 
+            // Формируем абсолютный путь.
+            // Если DOCUMENT_ROOT не подходит, раскомментируйте жёсткий путь ниже.
+            $upload_base = $_SERVER['DOCUMENT_ROOT'] . $src;
+            // $upload_base = "C:\\xampp\\htdocs\\cd-project\\butbalanced\\src\\"; // <-- жёсткий путь при необходимости
+
+            // Отладка: раскомментируйте, чтобы увидеть путь в сообщении
+            // $message .= '<div class="alert alert-info">DEBUG upload_base: ' . htmlspecialchars($upload_base) . '</div>';
+
             if (isset($_FILES['icon_file']) && $_FILES['icon_file']['error'] === UPLOAD_ERR_OK) {
-                $upload_dir = $src . 'heroes/';
+                $upload_dir = rtrim($upload_base, '/\\') . DIRECTORY_SEPARATOR . 'heroes' . DIRECTORY_SEPARATOR;
+
                 if (!is_dir($upload_dir)) {
                     mkdir($upload_dir, 0777, true);
                 }
+
                 $ext = pathinfo($_FILES['icon_file']['name'], PATHINFO_EXTENSION);
                 $safe_name = preg_replace('/[^a-zA-Z0-9_-]/u', '_', $name_hero);
                 $filename = $safe_name . '.' . strtolower($ext);
                 $target_file = $upload_dir . $filename;
+
                 if (move_uploaded_file($_FILES['icon_file']['tmp_name'], $target_file)) {
                     $icon_hero = $filename;
+                } else {
+                    $message .= '<div class="alert alert-warning">⚠️ Не удалось сохранить иконку. Путь: '
+                        . htmlspecialchars($target_file) . ' | Ошибка PHP: ' . error_get_last()['message'] . '</div>';
                 }
             }
 
             if (isset($_FILES['thumbnail_file']) && $_FILES['thumbnail_file']['error'] === UPLOAD_ERR_OK) {
-                $upload_dir = $src . 'heroes/crops/';
+                $upload_dir = rtrim($upload_base, '/\\') . DIRECTORY_SEPARATOR . 'heroes' . DIRECTORY_SEPARATOR . 'crops' . DIRECTORY_SEPARATOR;
+
                 if (!is_dir($upload_dir)) {
                     mkdir($upload_dir, 0777, true);
                 }
+
                 $ext = pathinfo($_FILES['thumbnail_file']['name'], PATHINFO_EXTENSION);
                 $safe_name = preg_replace('/[^a-zA-Z0-9_-]/u', '_', $name_hero);
                 $filename = $safe_name . '.' . strtolower($ext);
                 $target_file = $upload_dir . $filename;
+
                 if (move_uploaded_file($_FILES['thumbnail_file']['tmp_name'], $target_file)) {
                     $crop_hero = $filename;
+                } else {
+                    $message .= '<div class="alert alert-warning">⚠️ Не удалось сохранить миниатюру. Путь: '
+                        . htmlspecialchars($target_file) . '</div>';
                 }
             }
 
-            // Проверяем существует ли герой
+            // --- Проверка существования героя ---
             $check_query = "SELECT id_hero FROM heroes WHERE id_hero = :id_hero";
             $check_stmt = $db->prepare($check_query);
-            $check_stmt->bindParam(':id_hero', $hero_id);
+            $check_stmt->bindValue(':id_hero', $hero_id, PDO::PARAM_INT);
             $check_stmt->execute();
             $exists = $check_stmt->fetch();
 
@@ -101,33 +131,54 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                         complexity = :complexity
                     WHERE id_hero = :id_hero";
                 $stmt = $db->prepare($query);
-                $stmt->bindParam(':id_hero', $hero_id);
-                $stmt->bindParam(':name_hero', $name_hero);
-                $stmt->bindParam(':attribute_id', $attribute_id);
-                $stmt->bindParam(':icon_hero', $icon_hero);
-                $stmt->bindParam(':crop_hero', $crop_hero);
-                $stmt->bindParam(':complexity', $complexity);
+                $stmt->bindValue(':id_hero', $hero_id, PDO::PARAM_INT);
+                $stmt->bindValue(':name_hero', $name_hero);
+                $stmt->bindValue(':attribute_id', $attribute_id, PDO::PARAM_INT);
+                $stmt->bindValue(':icon_hero', $icon_hero);
+                $stmt->bindValue(':crop_hero', $crop_hero);
+                $stmt->bindValue(':complexity', $complexity, PDO::PARAM_INT);
                 $stmt->execute();
 
-                // UPDATE heroes_stats
+                $heroes_rows = $stmt->rowCount();
+
+                // UPSERT heroes_stats (PostgreSQL синтаксис)
                 $query2 = "
-                    UPDATE heroes_stats SET
-                        description_hero = :description_hero,
-                        full_description = :full_description,
-                        attack_type = :attack_type,
-                        roles = :roles,
-                        stats = :stats
-                    WHERE id_hero = :id_hero";
+                INSERT INTO heroes_stats (
+                    id_hero,
+                    description_hero,
+                    full_description,
+                    attack_type,
+                    roles,
+                    stats
+                ) VALUES (
+                    :id_hero,
+                    :description_hero,
+                    :full_description,
+                    :attack_type,
+                    :roles,
+                    :stats
+                )
+                ON CONFLICT (id_hero) DO UPDATE SET
+                    description_hero = EXCLUDED.description_hero,
+                    full_description = EXCLUDED.full_description,
+                    attack_type = EXCLUDED.attack_type,
+                    roles = EXCLUDED.roles,
+                    stats = EXCLUDED.stats";
                 $stmt2 = $db->prepare($query2);
-                $stmt2->bindParam(':id_hero', $hero_id);
-                $stmt2->bindParam(':description_hero', $description_hero);
-                $stmt2->bindParam(':full_description', $full_description);
-                $stmt2->bindParam(':attack_type', $attack_type);
-                $stmt2->bindParam(':roles', $roles_json);
-                $stmt2->bindParam(':stats', $stats_json);
+                $stmt2->bindValue(':id_hero', $hero_id, PDO::PARAM_INT);
+                $stmt2->bindValue(':description_hero', $description_hero);
+                $stmt2->bindValue(':full_description', $full_description);
+                $stmt2->bindValue(':attack_type', $attack_type, PDO::PARAM_INT);
+                $stmt2->bindValue(':roles', $roles_json);
+                $stmt2->bindValue(':stats', $stats_json);
                 $stmt2->execute();
+
+                $stats_rows = $stmt2->rowCount();
+
+                $message = '<div class="alert alert-success">✅ Герой #' . $hero_id . ' обновлён (heroes: ' . $heroes_rows . ', stats: ' . $stats_rows . ')</div>';
+
             } else {
-                // INSERT heroes (без id_hero — автоинкремент)
+                // INSERT нового героя
                 $query = "INSERT INTO heroes (
                     attribute_id,
                     name_hero,
@@ -142,15 +193,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                     :complexity
                 ) RETURNING id_hero";
                 $stmt = $db->prepare($query);
-                $stmt->bindParam(':attribute_id', $attribute_id);
-                $stmt->bindParam(':name_hero', $name_hero);
-                $stmt->bindParam(':icon_hero', $icon_hero);
-                $stmt->bindParam(':crop_hero', $crop_hero);
-                $stmt->bindParam(':complexity', $complexity);
+                $stmt->bindValue(':attribute_id', $attribute_id, PDO::PARAM_INT);
+                $stmt->bindValue(':name_hero', $name_hero);
+                $stmt->bindValue(':icon_hero', $icon_hero);
+                $stmt->bindValue(':crop_hero', $crop_hero);
+                $stmt->bindValue(':complexity', $complexity, PDO::PARAM_INT);
                 $stmt->execute();
                 $new_hero_id = $stmt->fetchColumn();
 
-                // INSERT heroes_stats
                 $query2 = "INSERT INTO heroes_stats (
                     id_hero,
                     description_hero,
@@ -167,21 +217,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                     :stats
                 )";
                 $stmt2 = $db->prepare($query2);
-                $stmt2->bindParam(':id_hero', $new_hero_id);
-                $stmt2->bindParam(':description_hero', $description_hero);
-                $stmt2->bindParam(':full_description', $full_description);
-                $stmt2->bindParam(':attack_type', $attack_type);
-                $stmt2->bindParam(':roles', $roles_json);
-                $stmt2->bindParam(':stats', $stats_json);
+                $stmt2->bindValue(':id_hero', $new_hero_id, PDO::PARAM_INT);
+                $stmt2->bindValue(':description_hero', $description_hero);
+                $stmt2->bindValue(':full_description', $full_description);
+                $stmt2->bindValue(':attack_type', $attack_type, PDO::PARAM_INT);
+                $stmt2->bindValue(':roles', $roles_json);
+                $stmt2->bindValue(':stats', $stats_json);
                 $stmt2->execute();
 
                 $hero_id = $new_hero_id;
+                $message = '<div class="alert alert-success">✅ Герой #' . $hero_id . ' создан!</div>';
             }
 
-            // Обновляем список героев
             $heroes = getAllHeroes($db);
-
-            $message = '<div class="alert alert-success">✅ Герой #' . $hero_id . ' успешно сохранен!</div>';
 
             if ($action === 'save_and_next') {
                 $current_index = min($current_index + 1, count($heroes) - 1);
@@ -189,7 +237,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
             }
 
         } catch (PDOException $e) {
-            $message = '<div class="alert alert-danger">❌ Ошибка: ' . $e->getMessage() . '</div>';
+            $message = '<div class="alert alert-danger">❌ Ошибка БД: ' . $e->getMessage() . '</div>';
         }
     } elseif ($action === 'navigate') {
         $current_index = (int)$_POST['current_index'];
@@ -214,7 +262,6 @@ if ($hero_id > 0) {
         $stmt->bindParam(':hero_id', $hero_id);
         $stmt->execute();
         $hero_data = $stmt->fetch(PDO::FETCH_ASSOC);
-
         if ($hero_data) {
             $roles_data = json_decode($hero_data['roles'] ?? '{}', true);
             $stats_data = json_decode($hero_data['stats'] ?? '{}', true);
@@ -241,7 +288,20 @@ $page_hero_name = ($current_hero && !empty($current_hero['name_hero'])) ? $curre
             </span>
         </h1>
 
-        <?php echo $message; ?>
+        <?php
+        echo '<script>
+            const dbStatus = ' . json_encode([
+                'success' => strpos($message, 'alert-success') !== false,
+                'error' => strpos($message, 'alert-danger') !== false,
+                'message' => strip_tags($message)
+            ]) . ';
+            if (dbStatus.error) {
+                console.error("%c[DB ERROR]", "color:red;font-weight:bold", dbStatus.message);
+            } else if (dbStatus.success) {
+                console.log("%c[DB OK]", "color:lime;font-weight:bold", dbStatus.message);
+            }
+        </script>';
+        ?>
 
         <!-- Навигация -->
         <div class="hero-navigation">
@@ -318,8 +378,8 @@ $page_hero_name = ($current_hero && !empty($current_hero['name_hero'])) ? $curre
                     <div class="col-md-6 mb-3">
                         <label for="attack_type" class="form-label">Тип атаки</label>
                         <select class="form-select" id="attack_type" name="attack_type">
-                            <option value="0" <?php echo (($current_hero['attack_type'] ?? '0') == '0') ? 'selected' : ''; ?>>Ближний</option>
-                            <option value="1" <?php echo (($current_hero['attack_type'] ?? '0') == '1') ? 'selected' : ''; ?>>Дальний</option>
+                            <option value="0" <?php echo (($hero_data['attack_type'] ?? '0') == '0') ? 'selected' : ''; ?>>Ближний</option>
+                            <option value="1" <?php echo (($hero_data['attack_type'] ?? '0') == '1') ? 'selected' : ''; ?>>Дальний</option>
                         </select>
                     </div>
                     <div class="col-md-6 mb-3">
@@ -332,11 +392,11 @@ $page_hero_name = ($current_hero && !empty($current_hero['name_hero'])) ? $curre
                     </div>
                     <div class="col-12 mb-3">
                         <label for="description_hero" class="form-label">Краткое описание</label>
-                        <textarea class="form-control" id="description_hero" name="description_hero" rows="2"><?php echo htmlspecialchars($current_hero['description_hero'] ?? ''); ?></textarea>
+                        <textarea class="form-control" id="description_hero" name="description_hero" rows="2"><?php echo htmlspecialchars($hero_data['description_hero'] ?? ''); ?></textarea>
                     </div>
                     <div class="col-12 mb-3">
                         <label for="full_description" class="form-label">Полное описание</label>
-                        <textarea class="form-control" id="full_description" name="full_description" rows="4"><?php echo htmlspecialchars($current_hero['full_description'] ?? ''); ?></textarea>
+                        <textarea class="form-control" id="full_description" name="full_description" rows="4"><?php echo htmlspecialchars($hero_data['full_description'] ?? ''); ?></textarea>
                     </div>
                 </div>
             </div>
@@ -382,7 +442,7 @@ $page_hero_name = ($current_hero && !empty($current_hero['name_hero'])) ? $curre
                     </div>
                     <div class="col-md-6 mb-3">
                         <label for="attack_interval" class="form-label">Интервал атак</label>
-                        <input type="number" step="0.01" class="form-control" id="attack_interval" name="attack_interval"
+                        <input type="number" step="0.1" class="form-control" id="attack_interval" name="attack_interval"
                             value="<?php echo htmlspecialchars($stats_data['attack_interval'] ?? ''); ?>">
                     </div>
                     <div class="col-md-3 mb-3">
@@ -407,7 +467,7 @@ $page_hero_name = ($current_hero && !empty($current_hero['name_hero'])) ? $curre
                     </div>
                     <div class="col-md-4 mb-3">
                         <label for="move_speed" class="form-label">Скорость передвижения</label>
-                        <input type="number" min="100" class="form-control" id="move_speed" name="move_speed"
+                        <input type="number" placeholder="100" min="100" class="form-control" id="move_speed" name="move_speed"
                             value="<?php echo htmlspecialchars($stats_data['move_speed'] ?? ''); ?>">
                     </div>
                     <div class="col-md-4 mb-3">
@@ -418,7 +478,7 @@ $page_hero_name = ($current_hero && !empty($current_hero['name_hero'])) ? $curre
                     <div class="col-md-4 mb-3">
                         <label for="vision" class="form-label">Дальность видимости</label>
                         <input type="text" class="form-control" id="vision" name="vision"
-                            value="<?php echo htmlspecialchars($stats_data['vision'] ?? ''); ?>" placeholder="1800/800">
+                            value="<?php echo htmlspecialchars($stats_data['vision'] ?? ''); ?>">
                     </div>
                 </div>
                 <div class="json-preview">
@@ -472,7 +532,7 @@ $page_hero_name = ($current_hero && !empty($current_hero['name_hero'])) ? $curre
             </div>
 
             <div class="d-flex gap-3" style="margin-top: 30px;">
-                <button type="submit" class="btn btn-primary-custom">
+                <button type="submit" name="action" class="btn btn-primary-custom">
                     <i class="bi bi-check2-circle"></i> Сохранить
                 </button>
                 <button type="submit" name="action" value="save_and_next" class="btn btn-success-custom">
@@ -543,4 +603,3 @@ document.querySelectorAll('input[type="file"]').forEach(input => {
     });
 });
 </script>
-<!--<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>-->
