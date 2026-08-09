@@ -46,6 +46,7 @@
             <?php include $_SERVER['DOCUMENT_ROOT'] . $baseUrl .'/tools/header.php'; ?>
 
             <?php
+                $heroSlug = '';
                 if (preg_match('/^hero\/([a-zA-Z-]+)$/', $route, $matches)) {
                     $heroSlug = $matches[1];
                     include __DIR__ . "/edit_heroes.php";

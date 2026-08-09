@@ -1,242 +1,174 @@
 <?php
-$heroSlug = isset($matches[1]) ? $matches[1] : "";
+$heroSlug = isset($heroSlug) ? $heroSlug : '';
+
+if (empty($heroSlug)) {
+    Header('Location:' . $baseUrl . 'heroes');
+    exit;
+}
 if(!isset($_SESSION['user_name']))
 {
     Header('Location:home');
 }
 
-$heroes = getAllHeroes($db);
 $message = '';
-$current_index = isset($_POST['current_index']) ? (int)$_POST['current_index'] : 0;
-$hero_id = isset($heroes[$current_index]['id_hero']) ? $heroes[$current_index]['id_hero'] : 0;
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
-    $action = $_POST['action'];
+// Ищем героя по slug (как в клиентской части)
+$query = "SELECT * FROM heroes WHERE LOWER(REPLACE(name_hero, ' ', '')) = :slug";
+$stmt = $db->prepare($query);
+$stmt->bindValue(':slug', $heroSlug);
+$stmt->execute();
+$current_hero = $stmt->fetch(PDO::FETCH_ASSOC);
 
-    if ($action === 'save' || $action === 'save_and_next') {
-        try {
-            $hero_id = (int)$_POST['hero_id'];
-            $name_hero = $_POST['name_hero'] ?? '';
-            $description_hero = $_POST['description_hero'] ?? '';
-            $full_description = $_POST['full_description'] ?? '';
-            $attack_type = (int)($_POST['attack_type'] ?? 0);
-            $complexity = (int)($_POST['complexity'] ?? 0);
-            $attribute_id = (int)($_POST['attribute_id'] ?? 0);
-            $role = $_POST['role'] ?? '';
-
-            // JSON роли
-            $roles = [
-                'core' => (int)($_POST['core'] ?? 0),
-                'support' => (int)($_POST['support'] ?? 0),
-                'burst' => (int)($_POST['burst'] ?? 0),
-                'control' => (int)($_POST['control'] ?? 0),
-                'jungle' => (int)($_POST['jungle'] ?? 0),
-                'tank' => (int)($_POST['tank'] ?? 0),
-                'escape' => (int)($_POST['escape'] ?? 0),
-                'siege' => (int)($_POST['siege'] ?? 0),
-                'initiation' => (int)($_POST['initiation'] ?? 0)
-            ];
-            $roles_json = json_encode($roles, JSON_UNESCAPED_UNICODE);
-
-            // JSON статы
-            $stats = [
-                'damage' => $_POST['damage'] ?? '',
-                'attack_interval' => (float)($_POST['attack_interval'] ?? 0),
-                'range' => (int)($_POST['range'] ?? 0),
-                'projectile_speed' => (int)($_POST['projectile_speed'] ?? 0),
-                'armor' => (float)($_POST['armor'] ?? 0),
-                'magic_resist' => (int)($_POST['magic_resist'] ?? 0),
-                'move_speed' => (int)($_POST['move_speed'] ?? 0),
-                'turn_rate' => (float)($_POST['turn_rate'] ?? 0),
-                'vision' => $_POST['vision'] ?? ''
-            ];
-            $stats_json = json_encode($stats, JSON_UNESCAPED_UNICODE);
-
-            // --- Обработка загрузки файлов ---
-            $icon_hero = $_POST['icon_hero'] ?? '';
-            $crop_hero = $_POST['crop_hero'] ?? '';
-            $upload_base = $_SERVER['DOCUMENT_ROOT'] . $src;
-
-            if (isset($_FILES['icon_file']) && $_FILES['icon_file']['error'] === UPLOAD_ERR_OK) {
-                $upload_dir = rtrim($upload_base, '/\\') . DIRECTORY_SEPARATOR . 'heroes' . DIRECTORY_SEPARATOR;
-                if (!is_dir($upload_dir)) mkdir($upload_dir, 0777, true);
-                $ext = pathinfo($_FILES['icon_file']['name'], PATHINFO_EXTENSION);
-                $safe_name = preg_replace('/[^a-zA-Z0-9_-]/u', '_', $name_hero);
-                $filename = $safe_name . '.' . strtolower($ext);
-                $target_file = $upload_dir . $filename;
-                if (move_uploaded_file($_FILES['icon_file']['tmp_name'], $target_file)) {
-                    $icon_hero = $filename;
-                }
-            }
-
-            if (isset($_FILES['thumbnail_file']) && $_FILES['thumbnail_file']['error'] === UPLOAD_ERR_OK) {
-                $upload_dir = rtrim($upload_base, '/\\') . DIRECTORY_SEPARATOR . 'heroes' . DIRECTORY_SEPARATOR . 'crops' . DIRECTORY_SEPARATOR;
-                if (!is_dir($upload_dir)) mkdir($upload_dir, 0777, true);
-                $ext = pathinfo($_FILES['thumbnail_file']['name'], PATHINFO_EXTENSION);
-                $safe_name = preg_replace('/[^a-zA-Z0-9_-]/u', '_', $name_hero);
-                $filename = $safe_name . '.' . strtolower($ext);
-                $target_file = $upload_dir . $filename;
-                if (move_uploaded_file($_FILES['thumbnail_file']['tmp_name'], $target_file)) {
-                    $crop_hero = $filename;
-                }
-            }
-
-            // --- Проверка существования героя ---
-            $check_query = "SELECT id_hero FROM heroes WHERE id_hero = :id_hero";
-            $check_stmt = $db->prepare($check_query);
-            $check_stmt->bindValue(':id_hero', $hero_id, PDO::PARAM_INT);
-            $check_stmt->execute();
-            $exists = $check_stmt->fetch();
-
-            if ($exists) {
-                // UPDATE heroes
-                $query = "UPDATE heroes SET
-                    name_hero = :name_hero,
-                    attribute_id = :attribute_id,
-                    icon_hero = :icon_hero,
-                    crop_hero = :crop_hero,
-                    complexity = :complexity
-                    WHERE id_hero = :id_hero";
-                $stmt = $db->prepare($query);
-                $stmt->bindValue(':id_hero', $hero_id, PDO::PARAM_INT);
-                $stmt->bindValue(':name_hero', $name_hero);
-                $stmt->bindValue(':attribute_id', $attribute_id, PDO::PARAM_INT);
-                $stmt->bindValue(':icon_hero', $icon_hero);
-                $stmt->bindValue(':crop_hero', $crop_hero);
-                $stmt->bindValue(':complexity', $complexity, PDO::PARAM_INT);
-                $stmt->execute();
-
-                // UPSERT heroes_stats
-                $query2 = "
-                INSERT INTO heroes_stats (
-                    id_hero,
-                    description_hero,
-                    full_description,
-                    attack_type,
-                    roles,
-                    stats
-                ) VALUES (
-                    :id_hero,
-                    :description_hero,
-                    :full_description,
-                    :attack_type,
-                    :roles,
-                    :stats
-                )
-                ON CONFLICT (id_hero) DO UPDATE SET
-                    description_hero = EXCLUDED.description_hero,
-                    full_description = EXCLUDED.full_description,
-                    attack_type = EXCLUDED.attack_type,
-                    roles = EXCLUDED.roles,
-                    stats = EXCLUDED.stats";
-                $stmt2 = $db->prepare($query2);
-                $stmt2->bindValue(':id_hero', $hero_id, PDO::PARAM_INT);
-                $stmt2->bindValue(':description_hero', $description_hero);
-                $stmt2->bindValue(':full_description', $full_description);
-                $stmt2->bindValue(':attack_type', $attack_type, PDO::PARAM_INT);
-                $stmt2->bindValue(':roles', $roles_json);
-                $stmt2->bindValue(':stats', $stats_json);
-                $stmt2->execute();
-
-                $message = '<div class="alert alert-success">Герой #' . $hero_id . ' обновлен!</div>';
-            } else {
-                // INSERT нового героя
-                $query = "
-                INSERT INTO heroes (
-                    attribute_id,
-                    name_hero,
-                    icon_hero,
-                    crop_hero,
-                    complexity
-                ) VALUES (
-                    :attribute_id,
-                    :name_hero,
-                    :icon_hero,
-                    :crop_hero,
-                    :complexity
-                ) RETURNING id_hero";
-                $stmt = $db->prepare($query);
-                $stmt->bindValue(':attribute_id', $attribute_id, PDO::PARAM_INT);
-                $stmt->bindValue(':name_hero', $name_hero);
-                $stmt->bindValue(':icon_hero', $icon_hero);
-                $stmt->bindValue(':crop_hero', $crop_hero);
-                $stmt->bindValue(':complexity', $complexity, PDO::PARAM_INT);
-                $stmt->execute();
-                $new_hero_id = $stmt->fetchColumn();
-
-                $query2 = "INSERT INTO heroes_stats (
-                    id_hero,
-                    description_hero,
-                    full_description,
-                    attack_type,
-                    roles,
-                    stats
-                ) VALUES (
-                    :id_hero,
-                    :description_hero,
-                    :full_description,
-                    :attack_type,
-                    :roles,
-                    :stats
-                )";
-                $stmt2 = $db->prepare($query2);
-                $stmt2->bindValue(':id_hero', $new_hero_id, PDO::PARAM_INT);
-                $stmt2->bindValue(':description_hero', $description_hero);
-                $stmt2->bindValue(':full_description', $full_description);
-                $stmt2->bindValue(':attack_type', $attack_type, PDO::PARAM_INT);
-                $stmt2->bindValue(':roles', $roles_json);
-                $stmt2->bindValue(':stats', $stats_json);
-                $stmt2->execute();
-
-                $hero_id = $new_hero_id;
-                $message = '<div class="alert alert-success">Герой #' . $hero_id . ' создан!</div>';
-            }
-
-            $heroes = getAllHeroes($db);
-
-            if ($action === 'save_and_next') {
-                $current_index = min($current_index + 1, count($heroes) - 1);
-                $hero_id = isset($heroes[$current_index]['id_hero']) ? $heroes[$current_index]['id_hero'] : 0;
-            }
-
-        } catch (PDOException $e) {
-            $message = '<div class="alert alert-danger">' . $e->getMessage() . '</div>';
-        }
-    } elseif ($action === 'navigate') {
-        $current_index = (int)$_POST['current_index'];
-        $hero_id = isset($heroes[$current_index]['id_hero']) ? $heroes[$current_index]['id_hero'] : 0;
-    }
+if (!$current_hero) {
+    Header('Location:' . $baseUrl . 'heroes');
+    exit;
 }
 
-$current_hero = null;
-$roles_data = null;
-$stats_data = null;
-$hero_data = null;
+$hero_id = $current_hero['id_hero'];
 
-if ($hero_id > 0) {
-    $query = "SELECT * FROM heroes WHERE id_hero = :hero_id";
-    $stmt = $db->prepare($query);
-    $stmt->bindParam(':hero_id', $hero_id);
-    $stmt->execute();
-    $current_hero = $stmt->fetch(PDO::FETCH_ASSOC);
+// Загружаем доп. данные
+$query = "SELECT * FROM heroes_stats WHERE id_hero = :hero_id";
+$stmt = $db->prepare($query);
+$stmt->bindValue(':hero_id', $hero_id, PDO::PARAM_INT);
+$stmt->execute();
+$hero_data = $stmt->fetch(PDO::FETCH_ASSOC);
 
-    if ($current_hero) {
-        $query = "SELECT * FROM heroes_stats WHERE id_hero = :hero_id";
-        $stmt = $db->prepare($query);
-        $stmt->bindParam(':hero_id', $hero_id);
-        $stmt->execute();
-        $hero_data = $stmt->fetch(PDO::FETCH_ASSOC);
-        if ($hero_data) {
-            $roles_data = json_decode($hero_data['roles'] ?? '{}', true);
-            $stats_data = json_decode($hero_data['stats'] ?? '{}', true);
+if ($hero_data) {
+    $roles_data = json_decode($hero_data['roles'] ?? '{}', true);
+    $stats_data = json_decode($hero_data['stats'] ?? '{}', true);
+}
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'save') {
+    try {
+        $name_hero = $_POST['name_hero'] ?? '';
+        $description_hero = $_POST['description_hero'] ?? '';
+        $full_description = $_POST['full_description'] ?? '';
+        $attack_type = (int)($_POST['attack_type'] ?? 0);
+        $complexity = (int)($_POST['complexity'] ?? 0);
+        $attribute_id = (int)($_POST['attribute_id'] ?? 0);
+        $role = $_POST['role'] ?? '';
+
+        // JSON роли
+        $roles = [
+            'core' => (int)($_POST['core'] ?? 0),
+            'support' => (int)($_POST['support'] ?? 0),
+            'burst' => (int)($_POST['burst'] ?? 0),
+            'control' => (int)($_POST['control'] ?? 0),
+            'jungle' => (int)($_POST['jungle'] ?? 0),
+            'tank' => (int)($_POST['tank'] ?? 0),
+            'escape' => (int)($_POST['escape'] ?? 0),
+            'siege' => (int)($_POST['siege'] ?? 0),
+            'initiation' => (int)($_POST['initiation'] ?? 0)
+        ];
+        $roles_json = json_encode($roles, JSON_UNESCAPED_UNICODE);
+
+        // JSON статы
+        $stats = [
+            'damage' => $_POST['damage'] ?? '',
+            'attack_interval' => (float)($_POST['attack_interval'] ?? 0),
+            'range' => (int)($_POST['range'] ?? 0),
+            'projectile_speed' => (int)($_POST['projectile_speed'] ?? 0),
+            'armor' => (float)($_POST['armor'] ?? 0),
+            'magic_resist' => (int)($_POST['magic_resist'] ?? 0),
+            'move_speed' => (int)($_POST['move_speed'] ?? 0),
+            'turn_rate' => (float)($_POST['turn_rate'] ?? 0),
+            'vision' => $_POST['vision'] ?? ''
+        ];
+        $stats_json = json_encode($stats, JSON_UNESCAPED_UNICODE);
+
+        // --- Обработка загрузки файлов ---
+        $icon_hero = $_POST['icon_hero'] ?? '';
+        $crop_hero = $_POST['crop_hero'] ?? '';
+        $upload_base = $_SERVER['DOCUMENT_ROOT'] . $src;
+
+        if (isset($_FILES['icon_file']) && $_FILES['icon_file']['error'] === UPLOAD_ERR_OK) {
+            $upload_dir = rtrim($upload_base, '/\\') . DIRECTORY_SEPARATOR . 'heroes' . DIRECTORY_SEPARATOR;
+            if (!is_dir($upload_dir)) mkdir($upload_dir, 0777, true);
+            $ext = pathinfo($_FILES['icon_file']['name'], PATHINFO_EXTENSION);
+            $safe_name = preg_replace('/[^a-zA-Z0-9_-]/u', '_', $name_hero);
+            $filename = $safe_name . '.' . strtolower($ext);
+            $target_file = $upload_dir . $filename;
+            if (move_uploaded_file($_FILES['icon_file']['tmp_name'], $target_file)) {
+                $icon_hero = $filename;
+            }
         }
+
+        if (isset($_FILES['thumbnail_file']) && $_FILES['thumbnail_file']['error'] === UPLOAD_ERR_OK) {
+            $upload_dir = rtrim($upload_base, '/\\') . DIRECTORY_SEPARATOR . 'heroes' . DIRECTORY_SEPARATOR . 'crops' . DIRECTORY_SEPARATOR;
+            if (!is_dir($upload_dir)) mkdir($upload_dir, 0777, true);
+            $ext = pathinfo($_FILES['thumbnail_file']['name'], PATHINFO_EXTENSION);
+            $safe_name = preg_replace('/[^a-zA-Z0-9_-]/u', '_', $name_hero);
+            $filename = $safe_name . '.' . strtolower($ext);
+            $target_file = $upload_dir . $filename;
+            if (move_uploaded_file($_FILES['thumbnail_file']['tmp_name'], $target_file)) {
+                $crop_hero = $filename;
+            }
+        }
+
+        // UPDATE heroes
+        $query = "UPDATE heroes SET
+            name_hero = :name_hero,
+            attribute_id = :attribute_id,
+            icon_hero = :icon_hero,
+            crop_hero = :crop_hero,
+            complexity = :complexity
+            WHERE id_hero = :id_hero";
+        $stmt = $db->prepare($query);
+        $stmt->bindValue(':id_hero', $hero_id, PDO::PARAM_INT);
+        $stmt->bindValue(':name_hero', $name_hero);
+        $stmt->bindValue(':attribute_id', $attribute_id, PDO::PARAM_INT);
+        $stmt->bindValue(':icon_hero', $icon_hero);
+        $stmt->bindValue(':crop_hero', $crop_hero);
+        $stmt->bindValue(':complexity', $complexity, PDO::PARAM_INT);
+        $stmt->execute();
+
+        // UPSERT heroes_stats
+        $query2 = "
+        INSERT INTO heroes_stats (
+            id_hero,
+            description_hero,
+            role,
+            full_description,
+            attack_type,
+            roles,
+            stats
+        ) VALUES (
+            :id_hero,
+            :description_hero,
+            :role,
+            :full_description,
+            :attack_type,
+            :roles,
+            :stats
+        )
+        ON CONFLICT (id_hero) DO UPDATE SET
+            description_hero = EXCLUDED.description_hero,
+            role = EXCLUDED.role,
+            full_description = EXCLUDED.full_description,
+            attack_type = EXCLUDED.attack_type,
+            roles = EXCLUDED.roles,
+            stats = EXCLUDED.stats
+        ";
+        $stmt2 = $db->prepare($query2);
+        $stmt2->bindValue(':id_hero', $hero_id, PDO::PARAM_INT);
+        $stmt2->bindValue(':description_hero', $description_hero);
+        $stmt2->bindValue(':role', $role);
+        $stmt2->bindValue(':full_description', $full_description);
+        $stmt2->bindValue(':attack_type', $attack_type, PDO::PARAM_INT);
+        $stmt2->bindValue(':roles', $roles_json);
+        $stmt2->bindValue(':stats', $stats_json);
+        $stmt2->execute();
+
+        // Редирект на список после успешного сохранения
+        Header('Location:' . $baseUrl . 'heroes');
+        exit;
+
+    } catch (PDOException $e) {
+        $message = '<div class="alert alert-danger">' . $e->getMessage() . '</div>';
     }
 }
 
 $attributes = getAttributes($db);
-$total_heroes = count($heroes);
-
-$page_hero_name = ($current_hero && !empty($current_hero['name_hero'])) ? $current_hero['name_hero'] : 'Новый герой';
 
 // Стандартные значения статов
 $default_stats = [
@@ -251,6 +183,7 @@ $default_stats = [
     'vision' => '1800/800'
 ];
 ?>
+
 
 <?php if (!empty($message)): ?>
 <script>
@@ -269,12 +202,6 @@ $default_stats = [
 
 <div class="hero-editor">
     <div class="card">
-        <h1>
-            <span style="color:#4a9eff;">&#9998;</span>
-            Редактор героев
-        </h1>
-
-        <?php echo $message; ?>
 
         <!-- Navigation -->
         <div class="hero-navigation">
@@ -287,7 +214,7 @@ $default_stats = [
                     <?php endif; ?>
                 </div>
                 <div>
-                    <div style="font-weight:600;color:#fff;"><?php echo htmlspecialchars($page_hero_name); ?></div>
+                    <div style="font-weight:800;color:#fff;"><?php echo htmlspecialchars($current_hero['name_hero']); ?></div>
                 </div>
             </div>
             <div class="nav-buttons">
@@ -299,10 +226,7 @@ $default_stats = [
             </div>
         </div>
 
-        <!-- Progress -->
-        <div class="progress-bar-custom">
-            <div class="progress-bar-fill" style="width: <?php echo $total_heroes > 0 ? (($current_index + 1) / $total_heroes * 100) : 0; ?>%;"></div>
-        </div>
+        <?php echo $message; ?>
 
         <form method="POST" enctype="multipart/form-data">
             <input type="hidden" name="action" value="save">
@@ -381,7 +305,6 @@ $default_stats = [
                     </div>
                     <?php endforeach; ?>
                 </div>
-                <div class="json-preview" id="rolesPreview">{}</div>
             </div>
 
             <!-- Stats -->
@@ -448,7 +371,6 @@ $default_stats = [
                         </div>
                     </div>
                 </div>
-                <div class="json-preview" id="statsPreview">{}</div>
             </div>
 
             <!-- Images -->
@@ -496,62 +418,12 @@ $default_stats = [
                 <button type="submit" name="action" class="btn btn-primary">
                     &#10003; Сохранить
                 </button>
-                <button type="submit" name="action" value="save_and_next" class="btn btn-success">
-                    &#10132; Сохранить и далее
-                </button>
             </div>
         </form>
     </div>
 </div>
 
 <script>
-// Title update
-document.getElementById('name_hero').addEventListener('input', function(e) {
-    const name = e.target.value.trim() || 'Новый герой';
-    document.title = name + ' - Редактор героев | ButBalanced';
-    document.querySelector('.hero-subtitle').textContent = name;
-});
-
-// Roles JSON preview
-function updateRolesPreview() {
-    const roles = {
-        core: +document.getElementById('core').value || 0,
-        support: +document.getElementById('support').value || 0,
-        burst: +document.getElementById('burst').value || 0,
-        control: +document.getElementById('control').value || 0,
-        jungle: +document.getElementById('jungle').value || 0,
-        tank: +document.getElementById('tank').value || 0,
-        escape: +document.getElementById('escape').value || 0,
-        siege: +document.getElementById('siege').value || 0,
-        initiation: +document.getElementById('initiation').value || 0
-    };
-    document.getElementById('rolesPreview').textContent = JSON.stringify(roles, null, 2);
-}
-document.querySelectorAll('#core, #support, #burst, #control, #jungle, #tank, #escape, #siege, #initiation')
-    .forEach(input => input.addEventListener('input', updateRolesPreview));
-
-// Stats JSON preview
-function updateStatsPreview() {
-    const stats = {
-        damage: document.getElementById('damage').value || '',
-        attack_interval: parseFloat(document.getElementById('attack_interval').value) || 0,
-        range: parseInt(document.getElementById('range').value) || 0,
-        projectile_speed: parseInt(document.getElementById('projectile_speed').value) || 0,
-        armor: parseFloat(document.getElementById('armor').value) || 0,
-        magic_resist: parseInt(document.getElementById('magic_resist').value) || 0,
-        move_speed: parseInt(document.getElementById('move_speed').value) || 0,
-        turn_rate: parseFloat(document.getElementById('turn_rate').value) || 0,
-        vision: document.getElementById('vision').value || ''
-    };
-    document.getElementById('statsPreview').textContent = JSON.stringify(stats, null, 2);
-}
-document.querySelectorAll('#damage, #attack_interval, #range, #projectile_speed, #armor, #magic_resist, #move_speed, #turn_rate, #vision')
-    .forEach(input => input.addEventListener('input', updateStatsPreview));
-
-// Init previews
-updateRolesPreview();
-updateStatsPreview();
-
 // File upload buttons
 document.getElementById('icon_file').addEventListener('change', function() {
     const name = this.files[0]?.name || 'Выбрать файл';

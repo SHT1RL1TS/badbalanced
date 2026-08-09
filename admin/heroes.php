@@ -51,8 +51,7 @@ $attrIcon = [
     <div class="byzyncxBWllmkGgs_PcLL">Герои не найдены</div>
     <div class="_3LrTPTY1adWYh0ceoy0QFj">
         <?php foreach ($heroes as $hero) :
-            $slug = strtolower($hero["name_hero"]);
-            $slug = str_replace(" ", "", $slug);
+            $slug = strtolower(str_replace(' ', '', $hero['name_hero']));
             $heroImg = $src . "/heroes/" . $hero["icon_hero"];
             ?>
             <a class="_7szOnSgHiQLEyU0_owKBB" href="<?= $baseUrl ?>hero/<?= $slug ?>" style="background-image: url(&quot;<?= $heroImg ?>&quot;);">
