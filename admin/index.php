@@ -48,10 +48,10 @@
             <?php
                 if (preg_match('/^hero\/([a-zA-Z-]+)$/', $route, $matches)) {
                     $heroSlug = $matches[1];
-                    include __DIR__ . "/edit_detail.php";
+                    include __DIR__ . "/edit_heroes.php";
                 } else {
                     switch ($route) {
-                        case '':
+
                         case 'home':
                             include 'home.php';
                             break;

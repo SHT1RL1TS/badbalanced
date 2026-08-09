@@ -46,31 +46,31 @@ $db = getDb();
 
             <?php include __DIR__ . "/tools/header.php"; ?>
 
-            <?php // /hero/имя_героя
-
-            if (preg_match('/^hero\/([a-zA-Z-]+)$/', $route, $matches)) {
-                $heroSlug = $matches[1];
-                include __DIR__ . "/hero_detail.php";
-            } else {
-                switch ($route) {
-                    case "home":
-                        include __DIR__ . "/home.php";
-                        break;
-                    case "news":
-                        include __DIR__ . "/news.php";
-                        break;
-                    case "heros":
-                        include __DIR__ . "/heroes.php";
-                        break;
-                    case "custom":
-                        include __DIR__ . "/custom.php";
-                        break;
-                    default:
-                        http_response_code(404);
-                        include __DIR__ . "/404.php";
-                        break;
+            <?php
+                if (preg_match('/^hero\/([a-zA-Z-]+)$/', $route, $matches)) {
+                    $heroSlug = $matches[1];
+                    include __DIR__ . "/hero_detail.php";
+                } else {
+                    switch ($route) {
+                        case "home":
+                            include __DIR__ . "/home.php";
+                            break;
+                        case "news":
+                            include __DIR__ . "/news.php";
+                            break;
+                        case "heros":
+                            include __DIR__ . "/heroes.php";
+                            break;
+                        case "custom":
+                            include __DIR__ . "/custom.php";
+                            break;
+                        default:
+                            http_response_code(404);
+                            // include __DIR__ . "/404.php";
+                            break;
+                    }
                 }
-            } ?>
+            ?>
             <!-- Общие скрипты -->
 
             <?php switch ($route) {

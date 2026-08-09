@@ -53,7 +53,7 @@ switch ($route) {
     overflow: auto; }
     .indiana-scroll-container--dragging {
         scroll-behavior: auto !important; }
-        .indiana-scroll-container--dragging > * {
+    .indiana-scroll-container--dragging > * {
         pointer-events: none;
         cursor: -webkit-grab;
         cursor: grab; }

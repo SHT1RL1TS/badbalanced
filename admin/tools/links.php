@@ -7,13 +7,15 @@
 switch ($route) {
     case 'home':
         echo '<link rel="stylesheet" type="text/css" href="' . $css . 'HOME_CSS.css">';
-        echo '<link rel="stylesheet" type="text/css" href="' . $css . 'VP_CSS.css">';
         break;
     case 'login':
         echo '<link rel="stylesheet" type="text/css" href="' . $css . 'ADMIN_LOGIN_CSS.css">';
         break;
     case 'heroes':
         echo '<link rel="stylesheet" type="text/css" href="' . $css . 'HEROES_CSS.css">';
+        break;
+    case 'hero':
+        echo '<link rel="stylesheet" type="text/css" href="' . $css . 'ADMIN_ADD.css">';
         break;
     case 'admin':
         echo '<link rel="stylesheet" type="text/css" href="' . $css . 'ADMIN_CSS.css">';
