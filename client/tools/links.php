@@ -22,7 +22,7 @@ switch ($route) {
 ?>
 
 <link type="image/x-icon" href="/cd-project/butbalanced/src/icon.jpg" rel="icon">
-<title>BadBalanced</title>
+<title>ButBalanced</title>
 
 <style type="text/css">
     @font-face {

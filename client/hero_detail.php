@@ -66,7 +66,7 @@ $attrIcon = [
             <!-- Иконка героя -->
             <div class="hero-icon-wrapper">
                 <img src="/cd-project/butbalanced/src/heroes/<?= $hero[
-                    "icon_url_hero"
+                    "icon_hero"
                 ] ?>" alt="<?= $hero[
     "name_hero"
 ] ?>" style="width: 200px; height: auto; border-radius: 10px; box-shadow: 0 0 30px rgba(0,0,0,0.5);">
@@ -163,6 +163,3 @@ $attrIcon = [
         </a>
     </div>
 </div>
-
-<style>
-</style>

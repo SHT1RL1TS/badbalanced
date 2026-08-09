@@ -14,17 +14,18 @@ switch ($route) {
     case 'heroes':
         echo '<link rel="stylesheet" type="text/css" href="' . $css . 'HEROES_CSS.css">';
         break;
-    case 'hero':
-        echo '<link rel="stylesheet" type="text/css" href="' . $css . 'ADMIN_ADD.css">';
-        break;
     case 'admin':
         echo '<link rel="stylesheet" type="text/css" href="' . $css . 'ADMIN_CSS.css">';
         break;
+    default:
+        if (preg_match("/^hero\//", $route)) {
+            echo '<link rel="stylesheet" type="text/css" href="' . $css . 'ADMIN_ADD.css">';
+        }
 }
 ?>
 
 <link type="image/x-icon" href="<?=$src?>icon.jpg" rel="icon">
-<title>BadBalanced</title>
+<title>ButBalanced</title>
 
 <style type="text/css">
     @font-face {

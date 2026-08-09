@@ -288,26 +288,14 @@ $default_stats = [
                 </div>
                 <div>
                     <div style="font-weight:600;color:#fff;"><?php echo htmlspecialchars($page_hero_name); ?></div>
-                    <div style="font-size:13px;color:#888;">
-                        <span class="badge-custom"><?php echo $current_index + 1; ?> / <?php echo $total_heroes ?: 1; ?></span>
-                    </div>
                 </div>
             </div>
             <div class="nav-buttons">
-                <form method="POST" style="display:inline;">
-                    <input type="hidden" name="action" value="navigate">
-                    <input type="hidden" name="current_index" value="<?php echo max(0, $current_index - 1); ?>">
-                    <button type="submit" class="btn btn-outline" <?php echo $current_index <= 0 ? 'disabled' : ''; ?>>
+                <a href=<?= $baseUrl . "heroes"?>>
+                    <button type="submit" class="btn btn-outline">
                         &#9664; Назад
                     </button>
-                </form>
-                <form method="POST" style="display:inline;">
-                    <input type="hidden" name="action" value="navigate">
-                    <input type="hidden" name="current_index" value="<?php echo min($total_heroes - 1, $current_index + 1); ?>">
-                    <button type="submit" class="btn btn-outline" <?php echo $current_index >= $total_heroes - 1 ? 'disabled' : ''; ?>>
-                        Вперед &#9654;
-                    </button>
-                </form>
+                </a>
             </div>
         </div>
 
