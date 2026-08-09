@@ -532,7 +532,7 @@ $page_hero_name = ($current_hero && !empty($current_hero['name_hero'])) ? $curre
             </div>
 
             <div class="d-flex gap-3" style="margin-top: 30px;">
-                <button type="submit" name="action" class="btn btn-primary-custom">
+                <button type="submit" name="action" value="save" class="btn btn-primary-custom">
                     <i class="bi bi-check2-circle"></i> Сохранить
                 </button>
                 <button type="submit" name="action" value="save_and_next" class="btn btn-success-custom">

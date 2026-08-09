@@ -12,10 +12,8 @@ switch ($route) {
     case 'login':
         echo '<link rel="stylesheet" type="text/css" href="' . $css . 'ADMIN_LOGIN_CSS.css">';
         break;
-    case 'patch/add':
-        echo '<link rel="stylesheet" type="text/css" href="' . $css . 'ADMIN_AH.css">';
-        echo '<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">';
-        echo '<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">';
+    case 'patch/edit':
+        echo '<link rel="stylesheet" type="text/css" href="' . $css . 'ADMIN_ADD.css">';
         break;
     case 'admin':
         echo '<link rel="stylesheet" type="text/css" href="' . $css . 'ADMIN_CSS.css">';

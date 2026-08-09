@@ -54,8 +54,8 @@
                     case 'login':
                         include 'login.php';
                         break;
-                    case 'patch/add':
-                        include 'add_heroes.php';
+                    case 'patch/edit':
+                        include 'edit_heroes.php';
                         break;
                     case 'logout':
                         include 'logout.php';
