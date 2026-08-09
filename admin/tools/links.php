@@ -12,8 +12,8 @@ switch ($route) {
     case 'login':
         echo '<link rel="stylesheet" type="text/css" href="' . $css . 'ADMIN_LOGIN_CSS.css">';
         break;
-    case 'patch/edit':
-        echo '<link rel="stylesheet" type="text/css" href="' . $css . 'ADMIN_ADD.css">';
+    case 'heroes':
+        echo '<link rel="stylesheet" type="text/css" href="' . $css . 'HEROES_CSS.css">';
         break;
     case 'admin':
         echo '<link rel="stylesheet" type="text/css" href="' . $css . 'ADMIN_CSS.css">';

@@ -9,7 +9,7 @@ switch ($route) {
         echo '<link rel="stylesheet" type="text/css" href="' . $css . 'NEWS_CSS.css">';
         break;
     case 'heros':
-        echo '<link rel="stylesheet" type="text/css" href="' . $css . 'HEROS_CSS.css">';
+        echo '<link rel="stylesheet" type="text/css" href="' . $css . 'HEROES_CSS.css">';
         break;
     case 'custom':
         echo '<link rel="stylesheet" type="text/css" href="' . $css . 'CUSTOM_CSS.css">';

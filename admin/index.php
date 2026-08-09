@@ -46,62 +46,43 @@
             <?php include $_SERVER['DOCUMENT_ROOT'] . $baseUrl .'/tools/header.php'; ?>
 
             <?php
-                switch ($route) {
-                    case '':
-                    case 'home':
-                        include 'home.php';
-                        break;
-                    case 'login':
-                        include 'login.php';
-                        break;
-                    case 'patch/edit':
-                        include 'edit_heroes.php';
-                        break;
-                    case 'logout':
-                        include 'logout.php';
-                        break;
-                    default:
-                        http_response_code(404);
-                        break;
+                if (preg_match('/^hero\/([a-zA-Z-]+)$/', $route, $matches)) {
+                    $heroSlug = $matches[1];
+                    include __DIR__ . "/edit_detail.php";
+                } else {
+                    switch ($route) {
+                        case '':
+                        case 'home':
+                            include 'home.php';
+                            break;
+                        case 'login':
+                            include 'login.php';
+                            break;
+                        case 'heroes':
+                            include 'heroes.php';
+                            break;
+                        case 'logout':
+                            include 'logout.php';
+                            break;
+                        default:
+                            http_response_code(404);
+                            break;
+                    }
                 }
-            ?>
-
-            <?php
-            // switch ($route) {
-            //     case 'home':
-            //         include 'patches/view_patch.php';
-            //         break;
-            //     case 'patch/add':
-            //         include 'patches/create_patch.php';
-            //         break;
-            //     case 'patch/edit':
-            //         include 'patches/add_change.php';
-            //         break;
-            //     case 'login':
-            //         include 'login.php';
-            //         break;
-            //     case 'logout':
-            //         include 'logout.php';
-            //         break;
-            //     default:
-            //         http_response_code(404);
-            //         // include $_SERVER['DOCUMENT_ROOT'] . '/404.php';
-            //         break;
-            // }
             ?>
 
             <?php include $_SERVER['DOCUMENT_ROOT'] . $baseUrl .'/tools/footer.php'; ?>
             <!-- Общие скрипты -->
             <?php
-            switch ($route) {
-                case 'home':
-                    echo '<script src="' . $baseUrl . 'JS/HOME_JS.js"></script>';
-                    break;
-                    case 'patches/add':
-                        echo '<script src="' . $baseUrl . 'JS/PATCH_JS.js></script>';
+                switch ($route) {
+                    case 'home':
+                        echo '<script src="' . $baseUrl . 'JS/HOME_JS.js"></script>';
                         break;
-                        }
-                        ?>
+                    case 'heroes':
+                        echo '<script src="' . $baseUrl . 'JS/HEROES_JS.js"></script>';
+                        break;
+                }
+            ?>
 
             <script src="<?=$baseUrl?>JS/HEADER_JS.js" defer></script>
             <script>

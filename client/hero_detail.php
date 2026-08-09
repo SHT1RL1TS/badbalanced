@@ -1,13 +1,20 @@
 <?php
 $heroSlug = isset($matches[1]) ? $matches[1] : "";
-
+print_r($heroSlug);
 // Получаем все данные героя по slug
 try {
     // Сначала получаем ID героя по slug
-    $query = "SELECT id_hero, name_hero, description_hero, stats_hero,
-                         icon_url_hero, thumbnail_url_hero, attribute_id
-                  FROM heroes
-                  WHERE LOWER(REPLACE(name_hero, ' ', '')) = :slug";
+    $query = "
+    SELECT
+        id_hero,
+        name_hero,
+        description_hero,
+        stats_hero,
+        icon_url_hero,
+        thumbnail_url_hero,
+        attribute_id
+    FROM heroes
+    WHERE LOWER(REPLACE(name_hero, ' ', '')) = :slug";
     $stmt = $db->prepare($query);
     $stmt->bindParam(":slug", $heroSlug);
     $stmt->execute();

@@ -1,5 +1,5 @@
 <?php
-
+$heroSlug = isset($matches[1]) ? $matches[1] : "";
 if(!isset($_SESSION['user_name']))
 {
     Header('Location:home');

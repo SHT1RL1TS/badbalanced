@@ -7,10 +7,10 @@ try {
         "\n";
 }
 $attrIcon = [
-    1 => $src . "icons/hero_strength.png",
-    2 => $src . "icons/hero_agility.png",
-    3 => $src . "icons/hero_intelligence.png",
-    4 => $src . "icons/hero_universal.png",
+    1 => $src . "/icons/hero_strength.png",
+    2 => $src . "/icons/hero_agility.png",
+    3 => $src . "/icons/hero_intelligence.png",
+    4 => $src . "/icons/hero_universal.png",
 ];
 ?>
 <div class="D36V-Zuy4P4h8Ogar6YWx" style="background-image: url(&quot;<?= $src?>/GUI/greyfade.jpg&quot;);">
@@ -55,14 +55,10 @@ $attrIcon = [
             $slug = str_replace(" ", "", $slug);
             $heroImg = $src . "/heroes/" . $hero["icon_hero"];
             ?>
-            <a class="_7szOnSgHiQLEyU0_owKBB" href="<?= $src?>hero/<?= $slug ?>" style="background-image: url(&quot;<?= $heroImg ?>&quot;);">
+            <a class="_7szOnSgHiQLEyU0_owKBB" href="<?= $baseUrl ?>hero/<?= $slug ?>" style="background-image: url(&quot;<?= $heroImg ?>&quot;);">
                 <div class="_3ldbS9dVE5CjfD0D09bBf">
-                    <img class="_12etdsZfZbhUB46YDOgrB8" src="<?= $attrIcon[
-                        $hero["attribute_id"]
-                    ] ?>">
-                    <div class="_3N-bh9taW0W_prRSK7IMzC"><?= $hero[
-                        "name_hero"
-                    ] ?></div>
+                    <img class="_12etdsZfZbhUB46YDOgrB8" src="<?= $attrIcon[$hero["attribute_id"]]?>">
+                    <div class="_3N-bh9taW0W_prRSK7IMzC"><?= $hero["name_hero"]?></div>
                 </div>
                 <div class="AbboqbOUC-VDkD7WOlB0X">
                     <div class="_1JDI3DcgSee71RA7XTqs2T _1NXAhOdbsQ_GmSo1oML7LS">

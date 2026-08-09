@@ -7,15 +7,16 @@
       <div class="_3WYK_cont">
         <?php if(isset($_SESSION['user_name'])): ?>
           <a class="_15Uwp7E3cvI8g0xSa_K9WK <?= $currentPage === 'home' ? '_3ulNR3VlHLYvZ3PQlOXxdm' : '' ?>" href="<?=$baseUrl?>home">home</a>
-          <div class="patches-dropdown" id="patchesDropdown">
+          <a class="_15Uwp7E3cvI8g0xSa_K9WK <?= $currentPage === 'heroes' ? '_3ulNR3VlHLYvZ3PQlOXxdm' : '' ?>" href="<?=$baseUrl?>heroes">heroes</a>
+          <!--<div class="patches-dropdown" id="patchesDropdown">
             <a class="_15Uwp7E3cvI8g0xSa_K9WK patches-btn <?= ($currentPage === 'patches' || $currentPage === 'patches/add' || $currentPage === 'patches/edit') ? '_3ulNR3VlHLYvZ3PQlOXxdm' : '' ?>" href="javascript:void(0)">
               PATCHES
             </a>
             <div class="patches-dropdown-content" id="patchesDropdownContent">
-              <a href="<?=$baseUrl?>patch/add">ADD</a>
-              <a href="<?=$baseUrl?>patch/edit">EDIT</a>
+              <a href="<=$baseUrl?>patch/add">ADD</a>
+              <a href="<=$baseUrl?>patch/edit">EDIT</a>
             </div>
-          </div>
+          </div>-->
         <?php else: ?>
           <a class="_15Uwp7E3cvI8g0xSa_K9WK <?= $currentPage === 'home' ? '_3ulNR3VlHLYvZ3PQlOXxdm' : '' ?>" href="<?=$baseUrl?>../client/home">home</a>
         <?php endif ?>
