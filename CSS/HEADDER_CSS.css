@@ -27,7 +27,7 @@
     min-width: 200px;
     height: 50px;
     min-height: 50px;
-    background-image: url(https://cdn.steamstatic.com/apps/dota2/images/dota_react/global/dota2_logo_horiz.png);
+    background-image: url(/cd-project/butbalanced/src/GUI/dota2_logo_horiz.png);
     background-size: contain;
     background-repeat: no-repeat;
     background-position: center center;

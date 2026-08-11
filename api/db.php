@@ -27,3 +27,14 @@ function getDb() {
     return $pdo;
 
 }
+
+$input = json_decode(file_get_contents('php://input'), true);
+if(isset($input['action']) && $input['action'] === 'getAllHeroes') {
+    $db = getDb();
+    $query = "SELECT *
+                FROM heroes
+                ORDER BY name_hero";
+    $stmt = $db->prepare($query);
+    $stmt->execute();
+    echo json_encode($stmt->fetchAll(PDO::FETCH_ASSOC));
+}
