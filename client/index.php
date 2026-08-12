@@ -97,11 +97,10 @@ $db = getDb();
                 default:
                     // Если это страница героя, подключаем её скрипт
                     if (preg_match("/^hero\//", $route)) {
-                        echo '<script src="' .
-                            $baseUrl .
-                            'JS/HERO_DETAIL_JS.js"></script>';
+                        echo '<script src="' . $baseUrl . 'JS/HERO_DETAIL_JS.js"></script>';
                     }
                     break;
             } ?>
+            <?php include __DIR__ . "/tools/footer.php"; ?>
         </body>
     </html>
