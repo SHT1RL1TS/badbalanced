@@ -388,6 +388,7 @@
 ._7szOnSgHiQLEyU0_owKBB .rggIBM38RzbadC8TxgcJi {
     transform: scale(0);
     pointer-events: none;
+    display: none !important;
 }
 
 * {
