@@ -25,18 +25,18 @@ $attrIcon = [
     </div>
     <div class="_2dEVdxZ62mXK6Hscx85kfA">
         <div class="_1Mwn_qHzqFFzIkYjIkLGm4">Фильтр</div>
-        <div class="_30qnjy6fkdTLNGj-OhqJZL">
+        <div class="_30qnjy6fkdTLNGj-OhqJZL atrr-btns">
             <div class="_1Y7hgUMU6SsAvmlZ_6l8Yf">Атрибут</div>
-            <div class="N74aaCii0wv_Ody2YGY_w" style="background-image: url(&quot;<?= $src?>/icons/filter-str-active.png&quot;);"></div>
-            <div class="N74aaCii0wv_Ody2YGY_w" style="background-image: url(&quot;<?= $src?>/icons/filter-agi-active.png&quot;);"></div>
-            <div class="N74aaCii0wv_Ody2YGY_w" style="background-image: url(&quot;<?= $src?>/icons/filter-int-active.png&quot;);"></div>
-            <div class="N74aaCii0wv_Ody2YGY_w" style="background-image: url(&quot;<?= $src?>/icons/filter-uni-active.png&quot;);"></div>
+            <div class="N74aaCii0wv_Ody2YGY_w attr-btns" data-attr-id="1" style="background-image: url(&quot;<?= $src?>/icons/filter-str-active.png&quot;);"></div>
+            <div class="N74aaCii0wv_Ody2YGY_w attr-btns" data-attr-id="2" style="background-image: url(&quot;<?= $src?>/icons/filter-agi-active.png&quot;);"></div>
+            <div class="N74aaCii0wv_Ody2YGY_w attr-btns" data-attr-id="3" style="background-image: url(&quot;<?= $src?>/icons/filter-int-active.png&quot;);"></div>
+            <div class="N74aaCii0wv_Ody2YGY_w attr-btns" data-attr-id="4" style="background-image: url(&quot;<?= $src?>/icons/filter-uni-active.png&quot;);"></div>
         </div>
         <div class="_30qnjy6fkdTLNGj-OhqJZL">
             <div class="_1Y7hgUMU6SsAvmlZ_6l8Yf">Сложность</div>
-            <div class="N74aaCii0wv_Ody2YGY_w" style="background-image: url(&quot;<?= $src?>/icons/filter-diamond.png&quot;);"></div>
-            <div class="N74aaCii0wv_Ody2YGY_w" style="background-image: url(&quot;<?= $src?>/icons/filter-diamond.png&quot;);"></div>
-            <div class="N74aaCii0wv_Ody2YGY_w" style="background-image: url(&quot;<?= $src?>/icons/filter-diamond.png&quot;);"></div>
+            <div class="N74aaCii0wv_Ody2YGY_w complexity-btns" data-complexity="1" style="background-image: url(&quot;<?= $src?>/icons/filter-diamond.png&quot;);"></div>
+            <div class="N74aaCii0wv_Ody2YGY_w complexity-btns" data-complexity="2" style="background-image: url(&quot;<?= $src?>/icons/filter-diamond.png&quot;);"></div>
+            <div class="N74aaCii0wv_Ody2YGY_w complexity-btns" data-complexity="3" style="background-image: url(&quot;<?= $src?>/icons/filter-diamond.png&quot;);"></div>
         </div>
         <div class="_2P5FcSZSA8Mfr716u_X1kk">
             <div class="_2paN1PFQTqGDNSagtldD_J">
@@ -51,10 +51,11 @@ $attrIcon = [
     <div class="byzyncxBWllmkGgs_PcLL">Герои не найдены</div>
     <div class="_3LrTPTY1adWYh0ceoy0QFj">
         <?php foreach ($heroes as $hero) :
-            $slug = strtolower(str_replace(' ', '', $hero['name_hero']));
+            $slug = strtolower($hero["name_hero"]);
+            $slug = str_replace(" ", "", $slug);
             $heroImg = $src . "/heroes/" . $hero["icon_hero"];
             ?>
-            <a class="_7szOnSgHiQLEyU0_owKBB" href="<?= $baseUrl ?>hero/<?= $slug ?>" style="background-image: url(&quot;<?= $heroImg ?>&quot;);">
+            <a class="_7szOnSgHiQLEyU0_owKBB" href="<?= $baseUrl ?>hero/<?= $slug ?>" data-name="<?= $hero["name_hero"] ?>" data-hero-attr-id="<?= $hero["attribute_id"]?>" data-complexity="<?=$hero['complexity']?>" style="background-image: url(&quot;<?= $heroImg ?>&quot;);">
                 <div class="_3ldbS9dVE5CjfD0D09bBf">
                     <img class="_12etdsZfZbhUB46YDOgrB8" src="<?= $attrIcon[$hero["attribute_id"]]?>">
                     <div class="_3N-bh9taW0W_prRSK7IMzC"><?= $hero["name_hero"]?></div>
