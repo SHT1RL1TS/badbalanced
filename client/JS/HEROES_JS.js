@@ -16,7 +16,7 @@ document.addEventListener('DOMContentLoaded', function() {
       else cols = 5;
 
       // Считаем ВИДИМЫЕ карточки, а не все 127
-      const visibleCards = grid.querySelectorAll('._7szOnSgHiQLEyU0_owKBB:not(.hidden)').length;
+      const visibleCards = grid.querySelectorAll('._7szOnSgHiQLEyU0_owKBB:not(.rggIBM38RzbadC8TxgcJi)').length;
       const rows = Math.ceil(visibleCards / cols);
 
       const height = rows * (CARD_HEIGHT + GAP) + PADDING;
@@ -81,10 +81,10 @@ function filterCard() {
       }
     }
     if (show) {
-      card.classList.remove('hidden');
+      card.classList.remove('rggIBM38RzbadC8TxgcJi');
       visibleCount++;
     } else {
-      card.classList.add('hidden');
+      card.classList.add('rggIBM38RzbadC8TxgcJi');
     }
   });
 
