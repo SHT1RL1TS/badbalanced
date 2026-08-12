@@ -8,7 +8,6 @@ document.addEventListener('DOMContentLoaded', function() {
   const CARD_HEIGHT = 127;
   const GAP = 15;
   const PADDING = 20;
-  const TOTAL_HEROES = 127;
 
   function updateGridHeight() {
       const width = window.innerWidth;
@@ -18,31 +17,26 @@ document.addEventListener('DOMContentLoaded', function() {
       else if (width <= 1300) cols = 4;
       else cols = 5;
 
-      // Расчет рядов
-      const rows = Math.ceil(TOTAL_HEROES / cols);
+      // Считаем ВИДИМЫЕ карточки, а не все 127
+      const visibleCards = grid.querySelectorAll('._7szOnSgHiQLEyU0_owKBB:not(.hidden)').length;
+      const rows = Math.ceil(visibleCards / cols);
 
-      // Расчет высоты
       const height = rows * (CARD_HEIGHT + GAP) + PADDING;
       grid.style.height = height + 'px';
-      if (cols < 4)
-      {
+
+      if (cols < 4) {
           back.style.height = height + 750 + 'px';
-      }
-      else
-      {
+      } else {
           back.style.height = height + 500 + 'px';
       }
 
-      // Обновляем CSS для grid
-      grid.style.gridTemplateColumns = `repeat(${cols}, 225px)`;
-
-      // Для мобильных делаем адаптивную ширину
+      // Убираем управление gridTemplateColumns из JS — теперь это делает CSS
       if (cols <= 2) {
           grid.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
           grid.style.height = 'auto';
           grid.style.minHeight = '500px';
       } else {
-          grid.style.gridTemplateColumns = `repeat(${cols}, 225px)`;
+          grid.style.gridTemplateColumns = ''; // сброс, чтобы работал CSS
           grid.style.height = height + 'px';
           grid.style.minHeight = 'auto';
       }
@@ -57,6 +51,9 @@ document.addEventListener('DOMContentLoaded', function() {
       clearTimeout(resizeTimer);
       resizeTimer = setTimeout(updateGridHeight, 200);
   });
+
+  // Экспортируем, чтобы filterCard мог вызвать
+  window.updateHeroGridHeight = updateGridHeight;
 });
 
 const searchinput = document.getElementById('search_hero');
@@ -67,8 +64,9 @@ function filterCard() {
 
   const attrValue = active_attr ? active_attr.dataset.attrId : null;
   const complexityValue = active_complexity ? active_complexity.dataset.complexity : null;
-
   const searchText = searchinput.value.toLowerCase().trim();
+
+  let visibleCount = 0;
 
   heroCards.forEach(card => {
     let show = true
@@ -86,10 +84,16 @@ function filterCard() {
     }
     if (show) {
       card.classList.remove('hidden');
+      visibleCount++;
     } else {
       card.classList.add('hidden');
     }
   });
+
+  // Пересчитываем высоту после фильтрации
+  if (window.updateHeroGridHeight) {
+    window.updateHeroGridHeight();
+  }
 }
 
 // N74aaCii0wv_Ody2YGY_w

@@ -244,7 +244,7 @@
 
 .D36V-Zuy4P4h8Ogar6YWx ._3LrTPTY1adWYh0ceoy0QFj {
     width: 1200px;
-    min-height: 1500px;
+    min-height: 500px;  /* убрали фикс 1500, пусть растет */
     margin-top: 15px;
     transition-property: height;
     transition-timing-function: ease-out;
@@ -256,10 +256,10 @@
     animation-name: NeQOPQgh06ixPcmoyJM01;
     position: relative;
     display: grid;
-    /* grid-template-columns: repeat(5, 1fr); */
+    grid-template-columns: repeat(5, 225px);  /* вернули явные колонки */
     gap: 15px;
+    justify-content: center;  /* центрируем, вместо space-between */
     justify-items: center;
-    justify-content: space-between;
     grid-auto-flow: row;
 }
 /* Адаптация под средние экраны - 4 колонки */
@@ -385,9 +385,9 @@
     padding-left: 0px;
     text-shadow: 0px 0px 4px #000
 }
-.hidden
-{
-    display: none !important;
+._7szOnSgHiQLEyU0_owKBB .rggIBM38RzbadC8TxgcJi {
+    transform: scale(0);
+    pointer-events: none;
 }
 
 * {

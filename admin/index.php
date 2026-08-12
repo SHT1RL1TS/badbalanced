@@ -80,7 +80,7 @@
                         echo '<script src="' . $baseUrl . 'JS/HOME_JS.js"></script>';
                         break;
                     case 'heroes':
-                        echo '<script src="' . $baseUrl . 'JS/HEROES_JS.js"></script>';
+                        echo '<script defer src="' . $baseUrl . 'JS/HEROES_JS.js"></script>';
                         break;
                 }
             ?>

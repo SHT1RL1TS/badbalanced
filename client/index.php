@@ -82,7 +82,7 @@ $db = getDb();
                 case "heros":
                     echo '<script src="' .
                         $baseUrl .
-                        'JS/HEROS_JS.js"></script>';
+                        'JS/HEROES_JS.js"></script>';
                     break;
                 case "custom":
                     echo '<script src="' .

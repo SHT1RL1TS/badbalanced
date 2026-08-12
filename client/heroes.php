@@ -55,7 +55,7 @@ $attrIcon = [
             $slug = str_replace(" ", "", $slug);
             $heroImg = $src . "/heroes/" . $hero["icon_hero"];
             ?>
-            <a class="_7szOnSgHiQLEyU0_owKBB" data-name="<?= $hero["name_hero"] ?>" data-hero-attr-id="<?= $hero["attribute_id"]?>" data-complexity="<?=$hero['complexity']?>" href="<?= $src?>hero/<?= $slug ?>" style="background-image: url(&quot;<?= $heroImg ?>&quot;);">
+            <a class="_7szOnSgHiQLEyU0_owKBB" data-name="<?= $hero["name_hero"] ?>" data-hero-attr-id="<?= $hero["attribute_id"]?>" data-complexity="<?=$hero['complexity']?>" href="<?= $baseUrl?>hero/<?= $slug ?>" style="background-image: url(&quot;<?= $heroImg ?>&quot;);">
                 <div class="_3ldbS9dVE5CjfD0D09bBf">
                     <img class="_12etdsZfZbhUB46YDOgrB8" src="<?= $attrIcon[$hero["attribute_id"]] ?>">
                     <div class="_3N-bh9taW0W_prRSK7IMzC"><?= $hero["name_hero"] ?></div>
