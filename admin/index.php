@@ -38,7 +38,6 @@
             <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1">
             <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
             <script src="https://unpkg.com/aos@2.3.1/dist/aos.js" defer></script>
-            <script src="<?=$baseUrl . 'jquery.min.js'?>" defer></script>
             <?php include $_SERVER['DOCUMENT_ROOT'] . $baseUrl . '/tools/links.php'; ?>
         </head>
         <body style="width:100%;margin:0;" data-aos-easing="ease" data-aos-duration="400" data-aos-delay="0">
@@ -82,6 +81,7 @@
             ?>
 
             <?php include $_SERVER['DOCUMENT_ROOT'] . $baseUrl .'/tools/footer.php'; ?>
+            <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
             <!-- Общие скрипты -->
             <?php
                 switch ($route) {
