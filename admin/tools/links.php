@@ -17,6 +17,11 @@ switch ($route) {
     case 'admin':
         echo '<link rel="stylesheet" type="text/css" href="' . $css . 'ADMIN_CSS.css">';
         break;
+    case 'skills':
+    case 'items':
+    case 'patches':
+        echo '<link rel="stylesheet" type="text/css" href="' . $css . 'ADMIN_EDITOR_CSS.css">';
+        break;
     default:
         if (preg_match("/^hero\//", $route)) {
             echo '<link rel="stylesheet" type="text/css" href="' . $css . 'ADMIN_ADD.css">';

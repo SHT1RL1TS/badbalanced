@@ -38,7 +38,7 @@
             <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1">
             <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
             <script src="https://unpkg.com/aos@2.3.1/dist/aos.js" defer></script>
-
+            <script src="<?=$baseUrl . 'jquery.min.js'?>" defer></script>
             <?php include $_SERVER['DOCUMENT_ROOT'] . $baseUrl . '/tools/links.php'; ?>
         </head>
         <body style="width:100%;margin:0;" data-aos-easing="ease" data-aos-duration="400" data-aos-delay="0">
@@ -65,6 +65,15 @@
                         case 'logout':
                             include 'logout.php';
                             break;
+                        case 'skills':
+                            include 'skills.php';
+                            break;
+                        case 'items':
+                            include 'items.php';
+                            break;
+                        case 'patches':
+                            include 'patches.php';
+                            break;
                         default:
                             http_response_code(404);
                             break;
@@ -78,6 +87,15 @@
                 switch ($route) {
                     case 'home':
                         echo '<script src="' . $baseUrl . 'JS/HOME_JS.js"></script>';
+                        break;
+                    case 'skills':
+                        echo '<script src="' . $baseUrl . 'JS/SKILLS_JS.js"></script>';
+                        break;
+                    case 'items':
+                        echo '<script src="' . $baseUrl . 'JS/ITEMS_JS.js"></script>';
+                        break;
+                    case 'patches':
+                        echo '<script src="' . $baseUrl . 'JS/PATCHES_JS.js"></script>';
                         break;
                     case 'heroes':
                         echo '<script defer src="' . $baseUrl . 'JS/HEROES_JS.js"></script>';

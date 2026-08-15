@@ -8,6 +8,9 @@
         <?php if(isset($_SESSION['user_name'])): ?>
           <a class="_15Uwp7E3cvI8g0xSa_K9WK <?= $currentPage === 'home' ? '_3ulNR3VlHLYvZ3PQlOXxdm' : '' ?>" href="<?=$baseUrl?>home">home</a>
           <a class="_15Uwp7E3cvI8g0xSa_K9WK <?= $currentPage === 'heroes' ? '_3ulNR3VlHLYvZ3PQlOXxdm' : '' ?>" href="<?=$baseUrl?>heroes">heroes</a>
+          <a class="_15Uwp7E3cvI8g0xSa_K9WK <?= $currentPage === 'skills' ? '_3ulNR3VlHLYvZ3PQlOXxdm' : '' ?>" href="<?=$baseUrl?>skills">skills</a>
+          <a class="_15Uwp7E3cvI8g0xSa_K9WK <?= $currentPage === 'items' ? '_3ulNR3VlHLYvZ3PQlOXxdm' : '' ?>" href="<?=$baseUrl?>items">items</a>
+          <a class="_15Uwp7E3cvI8g0xSa_K9WK <?= $currentPage === 'patches' ? '_3ulNR3VlHLYvZ3PQlOXxdm' : '' ?>" href="<?=$baseUrl?>patches">patches</a>
           <!--<div class="patches-dropdown" id="patchesDropdown">
             <a class="_15Uwp7E3cvI8g0xSa_K9WK patches-btn <?= ($currentPage === 'patches' || $currentPage === 'patches/add' || $currentPage === 'patches/edit') ? '_3ulNR3VlHLYvZ3PQlOXxdm' : '' ?>" href="javascript:void(0)">
               PATCHES
