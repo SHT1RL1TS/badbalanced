@@ -47,7 +47,7 @@ try {
 </div>
 
 <script>
-  const SKILLS_API = '<?=$baseUrl . 'api/skills_api.php'?>';
+  const SKILLS_API = '<?= $basePath . 'api/skills_api.php' ?>';
   function loadSkills() {
       $.get(SKILLS_API, {action:'list'}, function(r){
           if(r.success){

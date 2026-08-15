@@ -36,7 +36,7 @@ if(!isset($_SESSION['user_name'])) {
 </div>
 
 <script>
-  const ITEMS_API = '<?=$baseUrl . 'api/items_api.php'?>';
+  const ITEMS_API = '<?=$basePath . 'api/items_api.php'?>';
   function loadItems() {
       $.get(ITEMS_API, {action:'list'}, function(r){
           if(r.success){

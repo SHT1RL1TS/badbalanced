@@ -1,7 +1,8 @@
 // <?php
 // heroes_api.php — REST API для героев (AJAX/jQuery)
 header('Content-Type: application/json; charset=utf-8');
-require_once __DIR__ . '/db.php'; $db = getDb();
+require_once __DIR__ . '/db.php';
+$db = getDb_();
 $method = $_SERVER['REQUEST_METHOD'];
 $input = json_decode(file_get_contents('php://input'), true);
 switch ($method) {

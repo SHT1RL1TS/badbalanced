@@ -18,10 +18,37 @@ class Database {
         return $this->conn;
     }
 }
+class Database1 {
+    private $host = "localhost";
+    private $db_name = "bb";
+    private $username = "root";
+    private $password = "jdp96n";
+    public $con;
+
+    public function getConnection() {
+        $this->con = null;
+        try {
+            $this->con = new PDO("pgsql:host=" . $this->host . ";dbname=" . $this->db_name, $this->username, $this->password);
+            $this->con->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        } catch(PDOException $e) {
+            echo "Connection error: " . $e->getMessage();
+        }
+        return $this->con;
+    }
+}
 function getDb() {
     static $pdo = null;
     if ($pdo === null) {
         $database = new Database();
+        $pdo = $database->getConnection();
+    }
+    return $pdo;
+
+}
+function getDb_() {
+    static $pdo = null;
+    if ($pdo === null) {
+        $database = new Database1();
         $pdo = $database->getConnection();
     }
     return $pdo;

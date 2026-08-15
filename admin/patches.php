@@ -42,7 +42,7 @@ try {
 </div>
 
 <script>
-  const PATCHES_API = '<?= $baseUrl . 'api/patches_api.php'?>';
+  const PATCHES_API = '<?= $basePath . 'api/patches_api.php'?>';
   function loadPatches() {
       $.get(PATCHES_API, {action:'list'}, function(r){
           if(r.success){
