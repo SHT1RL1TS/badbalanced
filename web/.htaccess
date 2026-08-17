@@ -4,7 +4,7 @@
 </Files>
 # ------------------------------
 RewriteEngine On
-RewriteBase /cd-project/butbalanced/client/
+RewriteBase /client/index.php
 
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d

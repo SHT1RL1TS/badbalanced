@@ -1,7 +1,8 @@
-# ButBalanced
+# **ButBalanced**
+
 это сайт для кастомного режима 'ButBalanced' в Dota 2. создан в целях введения истории изменения
 ссылка на проект:
-https://steamcommunity.com/sharedfiles/filedetails/?id=3699416108
+<https://steamcommunity.com/sharedfiles/filedetails/?id=3699416108>
 
 ## 📋 Описание проекта
 
