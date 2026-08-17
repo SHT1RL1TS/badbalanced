@@ -11,4 +11,4 @@ RewriteCond %{REQUEST_FILENAME} !-d
 
 RewriteRule ^(.+)$ index.php [QSA,L]
 
-Header set Content-Security-Policy "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://unpkg.com;"
+# Header set Content-Security-Policy "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://unpkg.com;"
