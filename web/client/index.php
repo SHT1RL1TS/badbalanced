@@ -1,6 +1,6 @@
 <?php
 session_start();
-$basePath = "/cd-project/butbalanced/";
+$basePath = "/";
 $uri = parse_url($_SERVER["REQUEST_URI"], PHP_URL_PATH);
 $temp = $basePath . "client/";
 $route = str_replace($temp, "", $uri);
@@ -15,15 +15,15 @@ $baseUrl = $basePath . "client/";
 $link_cus = "https://steamcommunity.com/sharedfiles/filedetails/?id=3699416108";
 
 if (!isset($src)) {
-    $src = "/cd-project/butbalanced/src/";
+    $src = "/src/";
 }
 if (!isset($css)) {
-    $css = "/cd-project/butbalanced/CSS/";
+    $css = "/CSS/";
 }
 if (!isset($api)) {
     $api = [
-        "/cd-project/butbalanced/api/db.php",
-        "/cd-project/butbalanced/api/functions.php"
+        "/api/db.php",
+        "/api/functions.php"
     ];
 }
 foreach ((array)$api as $file) {

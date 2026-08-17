@@ -1,5 +1,5 @@
 <?php
-phpinfo();
+// phpinfo();
 echo "✅ Сайт работает!<br><br>";
 
 // Проверяем подключение к БД
@@ -26,3 +26,4 @@ try {
 } catch (PDOException $e) {
     echo "❌ Ошибка БД: " . $e->getMessage();
 }
+echo __DIR__;

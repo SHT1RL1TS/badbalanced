@@ -3,11 +3,17 @@
     Header unset Content-Security-Policy
 </Files>
 # ------------------------------
-RewriteEngine On
-RewriteBase /client/index.php
 
+RewriteEngine On
+RewriteBase /
+
+# Не перехватывать существующие файлы и папки
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
+
+# Не трогать client/ и admin/ — пусть они работают автономно
+RewriteCond %{REQUEST_URI} !^/client/
+RewriteCond %{REQUEST_URI} !^/admin/
 
 RewriteRule ^(.+)$ index.php [QSA,L]
 
