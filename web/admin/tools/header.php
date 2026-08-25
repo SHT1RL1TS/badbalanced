@@ -11,15 +11,6 @@
           <a class="_15Uwp7E3cvI8g0xSa_K9WK <?= $currentPage === 'skills' ? '_3ulNR3VlHLYvZ3PQlOXxdm' : '' ?>" href="<?=$baseUrl?>skills">skills</a>
           <a class="_15Uwp7E3cvI8g0xSa_K9WK <?= $currentPage === 'items' ? '_3ulNR3VlHLYvZ3PQlOXxdm' : '' ?>" href="<?=$baseUrl?>items">items</a>
           <a class="_15Uwp7E3cvI8g0xSa_K9WK <?= $currentPage === 'patches' ? '_3ulNR3VlHLYvZ3PQlOXxdm' : '' ?>" href="<?=$baseUrl?>patches">patches</a>
-          <!--<div class="patches-dropdown" id="patchesDropdown">
-            <a class="_15Uwp7E3cvI8g0xSa_K9WK patches-btn <?= ($currentPage === 'patches' || $currentPage === 'patches/add' || $currentPage === 'patches/edit') ? '_3ulNR3VlHLYvZ3PQlOXxdm' : '' ?>" href="javascript:void(0)">
-              PATCHES
-            </a>
-            <div class="patches-dropdown-content" id="patchesDropdownContent">
-              <a href="<=$baseUrl?>patch/add">ADD</a>
-              <a href="<=$baseUrl?>patch/edit">EDIT</a>
-            </div>
-          </div>-->
         <?php else: ?>
           <a class="_15Uwp7E3cvI8g0xSa_K9WK <?= $currentPage === 'home' ? '_3ulNR3VlHLYvZ3PQlOXxdm' : '' ?>" href="<?=$baseUrl?>../client/home">home</a>
         <?php endif ?>

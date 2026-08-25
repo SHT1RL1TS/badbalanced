@@ -1,6 +1,9 @@
 <?php
-    session_start();
-    $basePath = '/cd-project/butbalanced/';
+    if(session_status() !== PHP_SESSION_ACTIVE)
+    {
+        session_start();
+    }
+    $basePath = '';
     $uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
     $temp = $basePath . "admin/";
     $route = str_replace($temp, '', $uri);
@@ -14,22 +17,22 @@
     // Базовый URL для CSS и ссылок
     $baseUrl = $basePath . 'admin/';
     if (!isset($src)) {
-        $src = "/cd-project/butbalanced/src/";
+        $src = "src/";
     }
     if (!isset($css)) {
-        $css = "/cd-project/butbalanced/CSS/";
+        $css = "CSS/";
     }
-    if (!isset($api)) {
-        $api = [
-            "/cd-project/butbalanced/api/db.php",
-            "/cd-project/butbalanced/api/functions.php"
-        ];
-    }
-    foreach ((array)$api as $file) {
-        require_once $_SERVER['DOCUMENT_ROOT'] . $file;
-    }
-    /** @var PDO $db */
-    $db = getDb();
+    // if (!isset($api)) {
+    //     $api = [
+    //         "api/db.php",
+    //         "api/functions.php"
+    //     ];
+    // }
+    // foreach ((array)$api as $file) {
+    //     require_once $_SERVER['DOCUMENT_ROOT'] . $file;
+    // }
+    // /** @var PDO $db */
+    // $db = getDb();
 ?>
 <!DOCTYPE html>
     <html lang="ru">

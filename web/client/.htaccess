@@ -1,8 +1,14 @@
 RewriteEngine On
-RewriteBase /
+RewriteBase /client/
 
+# Не перехватывать существующие файлы и папки
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
-RewriteCond %{REQUEST_URI} !^/admin/
 
-RewriteRule ^(.+)$ client/index.php [QSA,L]
+# Не трогать client/ и admin/ — пусть они работают автономно
+# RewriteCond %{REQUEST_URI} !^/client/
+# RewriteCond %{REQUEST_URI} !^/admin/
+
+RewriteRule ^(.+)$ index.php [QSA,L]
+
+# Header set Content-Security-Policy "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://unpkg.com;"

@@ -1,5 +1,3 @@
-// JS/HEROS_JS.js
-
 document.addEventListener('DOMContentLoaded', function() {
   const grid = document.querySelector('._3LrTPTY1adWYh0ceoy0QFj');
   const back = document.querySelector('.D36V-Zuy4P4h8Ogar6YWx');

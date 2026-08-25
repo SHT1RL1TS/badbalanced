@@ -1,3 +1,9 @@
+# --- Исключение для Adminer ---
+<Files "adminer.php">
+    Header unset Content-Security-Policy
+</Files>
+# ------------------------------
+
 RewriteEngine On
 RewriteBase /cd-project/butbalanced/admin/
 

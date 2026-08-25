@@ -18,7 +18,7 @@ services:
     container_name: butbalanced_web
     ports:
       - "80:80"
-      - "9003:9003"  # порт для Xdebug
+      # - "9003:9003"  # порт для Xdebug
     depends_on:
       - db
     environment:
@@ -26,12 +26,13 @@ services:
       DB_USER: root
       DB_PASSWORD: jdp96n
       DB_NAME: butbalanced
-      XDEBUG_CONFIG: "client_host=host.docker.internal"
-      XDEBUG_MODE: "debug"
+      # XDEBUG_CONFIG: "client_host=host.docker.internal"
+      # XDEBUG_MODE: "debug"
 
     volumes:
       - ./web:/var/www/html   # синхронизация файлов
-      - ./web/xdebug_logs:/tmp  # логи Xdebug (опционально)
+      # - ./web/apache-cofig.conf:/etc/apache2/sites-available/000-default.conf:ro
+      # - ./web/xdebug_logs:/tmp  # логи Xdebug (опционально)
     restart: unless-stopped
 
 volumes:

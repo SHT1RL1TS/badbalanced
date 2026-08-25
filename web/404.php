@@ -17,7 +17,7 @@ http_response_code(404);
             <div>
                 <h1>404</h1>
                 <p>Страница не найдена</p>
-                <a href="/cd-project/butbalanced/client/home">На главную</a>
+                <a href="/client/home">На главную</a>
             </div>
         </body>
     </html>
