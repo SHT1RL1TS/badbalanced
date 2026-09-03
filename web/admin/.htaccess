@@ -5,7 +5,7 @@
 # ------------------------------
 
 RewriteEngine On
-RewriteBase /cd-project/butbalanced/admin/
+RewriteBase //admin/
 
 # Перенаправление patch/edit/name на patches/add_change.php
 RewriteRule ^patch/edit/(.+)$ patches/add_change.php [L,QSA]

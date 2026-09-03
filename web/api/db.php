@@ -1,10 +1,10 @@
 <?php
 
 class Database {
-    private $host = "localhost";
-    private $db_name = "butbalanced";
-    private $username = "root";
-    private $password = "jdp96n";
+    private $host = $_ENV['DB_HOST'];
+    private $db_name = $_ENV['DB_NAME'];
+    private $username = $_ENV['DB_USER'];
+    private $password = $_ENV['DB_PASSWORD'];
     public $conn;
 
     public function getConnection() {
@@ -19,10 +19,10 @@ class Database {
     }
 }
 class Database1 {
-    private $host = "localhost";
-    private $db_name = "bb";
-    private $username = "root";
-    private $password = "jdp96n";
+    private $host = $_ENV['DB_HOST'];
+    private $db_name = $_ENV['DB_NAME'];
+    private $username = $_ENV['DB_USER'];
+    private $password = $_ENV['DB_PASSWORD'];
     public $con;
 
     public function getConnection() {

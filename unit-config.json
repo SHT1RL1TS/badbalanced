@@ -1,0 +1,99 @@
+{
+    "listeners": {
+        "*:80": {
+            "pass": "routes"
+        }
+    },
+    "routes": [
+        {
+            "match": {
+                "uri": "/admin/patch/edit/*"
+            },
+            "action": {
+                "rewrite": "admin/patches/add_change.php",
+                "pass": "applications/php_admin"
+            }
+        },
+        {
+            "match": {
+                "uri": "/admin/patch/*"
+            },
+            "action": {
+                "rewrite": "admin/patches/view_single_patch.php",
+                "pass": "applications/php_admin"
+            }
+        },
+        {
+            "match": {
+                "uri": [
+                    "*.css",
+                    "*.js",
+                    "*.png",
+                    "*.jpg",
+                    "*.jpeg",
+                    "*.gif",
+                    "*.svg",
+                    "*.ico",
+                    "*.woff",
+                    "*.woff2",
+                    "*.ttf",
+                    "*.eot",
+                    "*.map",
+                    "*.webp"
+                ]
+            },
+            "action": {
+                "share": "/var/www/html$uri",
+                "fallback": {
+                    "pass": "applications/php_client"
+                }
+            }
+        },
+        {
+            "match": {
+                "uri": "/api/*"
+            },
+            "action": {
+                "pass": "applications/php_api"
+            }
+        },
+        {
+            "match": {
+                "uri": "/admin/*"
+            },
+            "action": {
+                "pass": "applications/php_admin"
+            }
+        },
+        {
+            "match": {
+                "uri": "/client/*"
+            },
+            "action": {
+                "pass": "applications/php_client"
+            }
+        },
+        {
+            "action": {
+                "pass": "applications/php_client"
+            }
+        }
+    ],
+    "applications": {
+        "php_client": {
+            "type": "php",
+            "root": "/var/www/html",
+            "script": "client/index.php"
+        },
+        "php_admin": {
+            "type": "php",
+            "root": "/var/www/html",
+            "script": "admin/index.php"
+        },
+        "php_api": {
+            "type": "php",
+            "root": "/var/www/html",
+            "index": "index.php"
+        }
+    }
+}

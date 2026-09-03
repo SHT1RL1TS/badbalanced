@@ -14,11 +14,12 @@ services:
     restart: unless-stopped
 
   web:
-    build: ./web
+    build:
+      context: ./web
+      dockerfile: Dockerfile.unit
     container_name: butbalanced_web
     ports:
       - "80:80"
-
     depends_on:
       - db
     environment:
@@ -26,10 +27,9 @@ services:
       DB_USER: root
       DB_PASSWORD: jdp96n
       DB_NAME: butbalanced
-
-
     volumes:
-      - ./web:/var/www/html   # синхронизация файлов
+      - ./web:/var/www/html
+      - ./unit-config.json:/docker-entrypoint.d/config.json:ro
     restart: unless-stopped
 
 volumes:

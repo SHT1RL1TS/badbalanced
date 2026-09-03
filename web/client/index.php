@@ -3,7 +3,7 @@ if(session_status() !== PHP_SESSION_ACTIVE)
 {
     session_start();
 }
-$basePath = $_SERVER['DOCUMENT_ROOT'];
+$basePath = __DIR__;
 $uri = parse_url($_SERVER["REQUEST_URI"], PHP_URL_PATH);
 $temp = $basePath . "client/";
 $route = str_replace($temp, "", $uri);
@@ -21,16 +21,16 @@ if (!isset($src)) {
     $src = "../src/";
 }
 if (!isset($css)) {
-    $css = "../CSS/";
+    $css = "/CSS/";
 }
 if (!isset($api)) {
     $api = [
-        "../api/db.php",
-        "../api/functions.php"
+        "/api/db.php",
+        "/api/functions.php"
     ];
 }
 foreach ((array)$api as $file) {
-    require_once $_SERVER['DOCUMENT_ROOT'] . $file;
+    require_once __DIR__ . $file;
 }
 /** @var PDO $db */
 $db = getDb();
@@ -43,7 +43,7 @@ $db = getDb();
             <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1">
             <!--<link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">-->
             <!--<script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>-->
-            <?php include __DIR__ . "../tools/links.php"; ?>
+            <?php include __DIR__ . "/tools/links.php"; ?>
         </head>
         <body style="width:100%;margin:0;" data-aos-easing="ease" data-aos-duration="400" data-aos-delay="0">
 
@@ -70,7 +70,7 @@ $db = getDb();
                         break;
                     default:
                         http_response_code(404);
-                        // include __DIR__ . "/404.php";
+                        include __DIR__ . "/404.php";
                         break;
                 }
             ?>

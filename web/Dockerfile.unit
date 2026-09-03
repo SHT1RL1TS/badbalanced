@@ -1,0 +1,24 @@
+FROM unit:php8.3
+
+# Устанавливаем PostgreSQL и curl (нужен для загрузки конфига)
+RUN apt-get update && apt-get install -y \
+    libpq-dev \
+    curl \
+    && docker-php-ext-install pdo_pgsql \
+    && apt-get clean && rm -rf /var/lib/apt/lists/*
+
+# Копируем проект
+COPY . /var/www/html/
+
+# Права
+RUN chown -R unit:unit /var/www/html \
+    && chmod -R 755 /var/www/html
+
+# Кастомный entrypoint
+COPY docker-entrypoint.sh /usr/local/bin/
+RUN chmod +x /usr/local/bin/docker-entrypoint.sh
+
+ENTRYPOINT ["docker-entrypoint.sh"]
+CMD ["unitd", "--no-daemon"]
+
+WORKDIR /var/www/html
