@@ -41,8 +41,9 @@ $db = getDb();
         <head>
             <meta charset="UTF-8">
             <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1">
-            <!--<link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">-->
-            <!--<script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>-->
+            <!--<link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+            <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>-->
+            <link rel="stylesheet" type="text/css" href="<?= $css ?>aos.css">
             <?php include __DIR__ . "/tools/links.php"; ?>
         </head>
         <body style="width:100%;margin:0;" data-aos-easing="ease" data-aos-duration="400" data-aos-delay="0">
@@ -72,8 +73,8 @@ $db = getDb();
                         break;
                 }
             ?>
+            <script src="<?= $baseUrl ?>JS/aos.js"></script>
             <!-- Общие скрипты -->
-
             <?php switch ($route) {
                 case "news":
                     echo '<script src="' .
