@@ -39,7 +39,9 @@
                     "*.ttf",
                     "*.eot",
                     "*.map",
-                    "*.webp"
+                    "*.webp",
+                    "*.mp4",
+                    "*.webm"
                 ]
             },
             "action": {
@@ -82,8 +84,8 @@
     "applications": {
         "php_client": {
             "type": "php",
-            "root": "/var/www/html",
-            "script": "client/index.php"
+            "root": "/var/www/html/",
+            "script": "index.php"
         },
         "php_admin": {
             "type": "php",
