@@ -3,18 +3,18 @@ if(session_status() !== PHP_SESSION_ACTIVE)
 {
     session_start();
 }
-$basePath = __DIR__;
 $uri = parse_url($_SERVER["REQUEST_URI"], PHP_URL_PATH);
-$temp = $basePath . "client/";
-$route = str_replace($temp, "", $uri);
-$route = trim($route, "/");
+$route = trim($uri, "/");
+
+// Убираем префикс client/ или client/index.php/
+$route = preg_replace('#^client(/index\.php)?/#', '', $route);
 
 if ($route === "" || $route === "index.php") {
     $route = "home";
 }
 
 // Базовый URL для CSS и ссылок
-$baseUrl = $basePath . "client/";
+$baseUrl = "/";
 $link_cus = "https://steamcommunity.com/sharedfiles/filedetails/?id=3699416108";
 
 if (!isset($src)) {
@@ -25,12 +25,12 @@ if (!isset($css)) {
 }
 if (!isset($api)) {
     $api = [
-        "/api/db.php",
-        "/api/functions.php"
+        "../api/db.php",
+        "../api/functions.php"
     ];
 }
 foreach ((array)$api as $file) {
-    require_once __DIR__ . $file;
+    require_once $file;
 }
 /** @var PDO $db */
 $db = getDb();
@@ -57,20 +57,18 @@ $db = getDb();
                 // }
                 switch ($route) {
                     case "home":
-                        include __DIR__ . "/home.php";
+                        include "home.php";
                         break;
                     case "news":
-                        include __DIR__ . "/news.php";
+                        include "news.php";
                         break;
                     case "heros":
-                        include __DIR__ . "/heroes.php";
+                        include "heroes.php";
                         break;
                     case "custom":
-                        include __DIR__ . "/custom.php";
+                        include "custom.php";
                         break;
                     default:
-                        http_response_code(404);
-                        include __DIR__ . "/404.php";
                         break;
                 }
             ?>
@@ -79,23 +77,19 @@ $db = getDb();
             <?php switch ($route) {
                 case "news":
                     echo '<script src="' .
-                        $baseUrl .
-                        'JS/NEWS_JS.js"></script>';
+                        '../JS/NEWS_JS.js"></script>';
                     break;
                 case "heros":
                     echo '<script src="' .
-                        $baseUrl .
-                        'JS/HEROES_JS.js"></script>';
+                        '../JS/HEROES_JS.js"></script>';
                     break;
                 case "custom":
                     echo '<script src="' .
-                        $baseUrl .
-                        'JS/CUSTOM_JS.js"></script>';
+                        '../JS/CUSTOM_JS.js"></script>';
                     break;
                 case "home":
                     echo '<script src="' .
-                        $baseUrl .
-                        'JS/HOME_JS.js"></script>';
+                        '../JS/HOME_JS.js"></script>';
                     break;
                 // default:
                 //     // Если это страница героя, подключаем её скрипт

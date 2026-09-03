@@ -1,11 +1,18 @@
 <?php
 
 class Database {
-    private $host = $_ENV['DB_HOST'];
-    private $db_name = $_ENV['DB_NAME'];
-    private $username = $_ENV['DB_USER'];
-    private $password = $_ENV['DB_PASSWORD'];
+    private $host;
+    private $db_name;
+    private $username;
+    private $password;
     public $conn;
+
+    public function __construct() {
+        $this->host     = $_ENV['DB_HOST']     ?? 'localhost';
+        $this->db_name  = $_ENV['DB_NAME']      ?? 'butbalanced';
+        $this->username = $_ENV['DB_USER']      ?? 'root';
+        $this->password = $_ENV['DB_PASSWORD']   ?? 'jdp96n';
+    }
 
     public function getConnection() {
         $this->conn = null;
@@ -18,12 +25,20 @@ class Database {
         return $this->conn;
     }
 }
+
 class Database1 {
-    private $host = $_ENV['DB_HOST'];
-    private $db_name = $_ENV['DB_NAME'];
-    private $username = $_ENV['DB_USER'];
-    private $password = $_ENV['DB_PASSWORD'];
+    private $host;
+    private $db_name;
+    private $username;
+    private $password;
     public $con;
+
+    public function __construct() {
+        $this->host     = $_ENV['DB_HOST']     ?? 'localhost';
+        $this->db_name  = 'bb';
+        $this->username = $_ENV['DB_USER']      ?? 'root';
+        $this->password = $_ENV['DB_PASSWORD']   ?? 'jdp96n';
+    }
 
     public function getConnection() {
         $this->con = null;
@@ -36,6 +51,7 @@ class Database1 {
         return $this->con;
     }
 }
+
 function getDb() {
     static $pdo = null;
     if ($pdo === null) {
@@ -43,8 +59,8 @@ function getDb() {
         $pdo = $database->getConnection();
     }
     return $pdo;
-
 }
+
 function getDb_() {
     static $pdo = null;
     if ($pdo === null) {
@@ -52,7 +68,6 @@ function getDb_() {
         $pdo = $database->getConnection();
     }
     return $pdo;
-
 }
 
 $input = json_decode(file_get_contents('php://input'), true);

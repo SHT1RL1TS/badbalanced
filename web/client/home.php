@@ -4,8 +4,8 @@
             <div class="_156AjI7kQZjpXGm2iAHBC5">
                 <div class="_33v9_fGu2Rr0yBu8UtsgiC">
                     <video autoplay muted preload="auto" loop playsinline>
-                        <source src="../src/Movie/dota_montage_02.mp4" type="video/mp4">
-                        <source src="../src/Movie/dota_montage_webm.webm" type="video/webm">
+                        <source src="<?= $src . 'Movie/dota_montage_02.mp4'?>" type="video/mp4">
+                        <source src="<?= $src . 'Movie/dota_montage_0.webm'?>" type="video/webm">
                     </video>
                 </div>
                 <div class="t1GDTpXDdYcZBGOKzy3v-" data-aos="fade-right" data-aos-delay="1000" data-aos-duration="2500">

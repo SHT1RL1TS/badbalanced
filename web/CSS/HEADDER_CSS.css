@@ -27,7 +27,7 @@
     min-width: 200px;
     height: 50px;
     min-height: 50px;
-    background-image: url(/cd-project/butbalanced/src/GUI/dota2_logo_horiz.png);
+    background-image: url(../src/GUI/dota2_logo_horiz.png);
     background-size: contain;
     background-repeat: no-repeat;
     background-position: center center;
@@ -117,7 +117,7 @@
     height: 20px;
     background-size: contain;
     background-repeat: no-repeat;
-    background-image: url('/cd-project/butbalanced/src/GUI/steam_icon.svg');
+    background-image: url('../src/GUI/steam_icon.svg');
 }
 ._3mkXBKss9wSruUD_7H5MtF .jIe9rI7tP_TtNi1NrkgzW {
     font-size: 20px;
@@ -131,7 +131,7 @@
 
 @media (max-width: 1300px) {
     .U7wdCoQycRPyErCfTw2sv .RsnZktJ6AqSXT0LNzVzby .ZFf5SKOhUeoF1JmIVX9RT {
-        background-image: url('/cd-project/butbalanced/src/GUI/dota2_logo_symbol.png');
+        background-image: url('../src/GUI/dota2_logo_symbol.png');
         width: 50px;
         min-width: 50px;
         height: 50px;
