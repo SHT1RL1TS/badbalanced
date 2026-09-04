@@ -6,8 +6,8 @@
     $uri = parse_url($_SERVER["REQUEST_URI"], PHP_URL_PATH);
     $route = trim($uri, "/");
 
-    // Убираем префикс client/ или client/index.php/
-    $route = preg_replace('#^client(/index\.php)?/#', '', $route);
+    // Убираем префикс admin/ или admin/index.php/
+    $route = preg_replace('#^admin(/index\.php)?/#', '', $route);
 
     if ($route === "" || $route === "index.php") {
         $route = "home";
