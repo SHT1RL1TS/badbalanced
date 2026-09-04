@@ -2,7 +2,7 @@
   <div class="bb-footer-top">
     <div class="bb-footer-logos">
       <!-- Логотип ButBalanced -->
-      <a href="/cd-project/butbalanced/client/home" class="bb-footer-logo bb-logo-bb">
+      <a href="/home" class="bb-footer-logo bb-logo-bb">
         <img src="<?= $src?>GUI/butbalanced_logo.png" alt="ButBalanced">
       </a>
       <!-- Логотип Valve -->

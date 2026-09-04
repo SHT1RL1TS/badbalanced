@@ -85,7 +85,7 @@
         "php_client": {
             "type": "php",
             "root": "/var/www/html/",
-            "script": "index.php"
+            "script": "client/index.php"
         },
         "php_admin": {
             "type": "php",

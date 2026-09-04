@@ -12,13 +12,13 @@
           <a class="_15Uwp7E3cvI8g0xSa_K9WK <?= $currentPage === 'items' ? '_3ulNR3VlHLYvZ3PQlOXxdm' : '' ?>" href="<?=$baseUrl?>items">items</a>
           <a class="_15Uwp7E3cvI8g0xSa_K9WK <?= $currentPage === 'patches' ? '_3ulNR3VlHLYvZ3PQlOXxdm' : '' ?>" href="<?=$baseUrl?>patches">patches</a>
         <?php else: ?>
-          <a class="_15Uwp7E3cvI8g0xSa_K9WK <?= $currentPage === 'home' ? '_3ulNR3VlHLYvZ3PQlOXxdm' : '' ?>" href="<?=$baseUrl?>../client/home">home</a>
+          <a class="_15Uwp7E3cvI8g0xSa_K9WK <?= $currentPage === 'home' ? '_3ulNR3VlHLYvZ3PQlOXxdm' : '' ?>" href="<?=$baseUrl?>/client/home">home</a>
         <?php endif ?>
       </div>
       <?php if(isset($_SESSION['user_name'])): ?>
-        <a class="_15Uwp7E3cvI8g0xSa_K9WK <?= $currentPage === 'logout' ? '_3ulNR3VlHLYvZ3PQlOXxdm' : '' ?>" href="<?=$baseUrl?>logout">logout</a>
+        <a class="_15Uwp7E3cvI8g0xSa_K9WK <?= $currentPage === 'logout' ? '_3ulNR3VlHLYvZ3PQlOXxdm' : '' ?>" href="<?=$baseUrl . 'admin/'?>logout">logout</a>
       <?php else: ?>
-        <a class="_15Uwp7E3cvI8g0xSa_K9WK <?= $currentPage === 'login' ? '_3ulNR3VlHLYvZ3PQlOXxdm' : '' ?>" href="<?=$baseUrl?>login">login</a>
+        <a class="_15Uwp7E3cvI8g0xSa_K9WK <?= $currentPage === 'login' ? '_3ulNR3VlHLYvZ3PQlOXxdm' : '' ?>" href="<?=$baseUrl . 'admin/'?>login">login</a>
       <?php endif ?>
     </div>
     <div class="MM-C2Bi-pVHzw7EMKBDgZ">

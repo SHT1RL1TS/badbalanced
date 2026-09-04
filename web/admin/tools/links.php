@@ -29,7 +29,7 @@ switch ($route) {
 }
 ?>
 
-<link type="image/x-icon" href="<?=$src?>icon.jpg" rel="icon">
+<link type="image/x-icon" href="<?=$src. "icon.jpg"?>" rel="icon">
 <title>ButBalanced</title>
 
 <style type="text/css">

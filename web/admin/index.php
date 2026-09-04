@@ -3,36 +3,35 @@
     {
         session_start();
     }
-    $basePath = '';
-    $uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
-    $temp = $basePath . "admin/";
-    $route = str_replace($temp, '', $uri);
-    $route = trim($route, '/');
-    if (!isset($_SESSION['user_name'])) {
-        if ($route === '' || $route === 'index.php' || $route === 'home') {
-            $route = 'login';
-            Header('Location:login');
-        }
+    $uri = parse_url($_SERVER["REQUEST_URI"], PHP_URL_PATH);
+    $route = trim($uri, "/");
+
+    // Убираем префикс client/ или client/index.php/
+    $route = preg_replace('#^client(/index\.php)?/#', '', $route);
+
+    if ($route === "" || $route === "index.php") {
+        $route = "home";
     }
+
     // Базовый URL для CSS и ссылок
-    $baseUrl = $basePath . 'admin/';
+    $baseUrl = "/";
     if (!isset($src)) {
-        $src = "src/";
+        $src = "/src/";
     }
     if (!isset($css)) {
-        $css = "CSS/";
+        $css = "/CSS/";
     }
-    // if (!isset($api)) {
-    //     $api = [
-    //         "api/db.php",
-    //         "api/functions.php"
-    //     ];
-    // }
-    // foreach ((array)$api as $file) {
-    //     require_once $_SERVER['DOCUMENT_ROOT'] . $file;
-    // }
-    // /** @var PDO $db */
-    // $db = getDb();
+    if (!isset($api)) {
+        $api = [
+            "/api/db.php",
+            "/api/functions.php"
+        ];
+    }
+    foreach ((array)$api as $file) {
+        require_once $_SERVER['DOCUMENT_ROOT'] . $file;
+    }
+    /** @var PDO $db */
+    $db = getDb();
 ?>
 <!DOCTYPE html>
     <html lang="ru">
@@ -40,13 +39,13 @@
             <meta charset="UTF-8">
             <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1">
             <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
-            <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
             <script src="https://unpkg.com/aos@2.3.1/dist/aos.js" defer></script>
-            <?php include $_SERVER['DOCUMENT_ROOT'] . $baseUrl . '/tools/links.php'; ?>
+            <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+            <?php include __DIR__ . '/tools/links.php'; ?>
         </head>
         <body style="width:100%;margin:0;" data-aos-easing="ease" data-aos-duration="400" data-aos-delay="0">
 
-            <?php include $_SERVER['DOCUMENT_ROOT'] . $baseUrl .'/tools/header.php'; ?>
+            <?php include __DIR__ .'/tools/header.php'; ?>
 
             <?php
                 $heroSlug = '';
@@ -77,14 +76,10 @@
                         case 'patches':
                             include 'patches.php';
                             break;
-                        default:
-                            http_response_code(404);
-                            break;
                     }
                 }
             ?>
 
-            <?php include $_SERVER['DOCUMENT_ROOT'] . $baseUrl .'/tools/footer.php'; ?>
             <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
             <!-- Общие скрипты -->
             <?php
@@ -126,5 +121,6 @@
                     });
                 }
             </script>
+            <?php include __DIR__ . "/tools/footer.php"; ?>
         </body>
     </html>

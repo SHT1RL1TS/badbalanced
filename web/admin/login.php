@@ -7,14 +7,9 @@
     {
         $username = $_POST['username'];
         $password = $_POST['password'];
-        $host = 'localhost';
-        $port = '5432';
-        $dbname = 'butbalanced';
-        $user = 'postgres';
-        $password_db = 'jdp96n';
 
         // Строка подключения
-        $connection_string = "host=$host port=$port dbname=$dbname user=$user password=$password_db";
+        $connection_string = "host=$_ENV['DB_HOST'] port='5432' dbname=$_ENV['DB_NAME'] user=$_ENV['DB_USER'] password=$_ENV['DB_PASSWORD']";
 
         // Пробуем подключиться
         $con = pg_connect($connection_string);
