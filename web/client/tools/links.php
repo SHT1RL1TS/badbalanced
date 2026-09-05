@@ -5,16 +5,16 @@
 <!-- CSS для конкретных страниц -->
 <?php
 switch ($route) {
-    case 'news':
+    case '/news':
         echo '<link rel="stylesheet" type="text/css" href="' . $css . 'NEWS_CSS.css">';
         break;
-    case 'heros':
+    case '/heros':
         echo '<link rel="stylesheet" type="text/css" href="' . $css . 'HEROES_CSS.css">';
         break;
-    case 'custom':
+    case '/custom':
         echo '<link rel="stylesheet" type="text/css" href="' . $css . 'CUSTOM_CSS.css">';
         break;
-    case 'home':
+    case '/home':
         echo '<link rel="stylesheet" type="text/css" href="' . $css . 'HOME_CSS.css">';
         echo '<link rel="stylesheet" type="text/css" href="' . $css . 'HERO_DETAIL_CSS.css">';
         break;

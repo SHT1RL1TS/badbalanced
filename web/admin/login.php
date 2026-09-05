@@ -1,33 +1,12 @@
 <?php
-    if(session_status() !== PHP_SESSION_ACTIVE)
-    {
-        session_start();
-    }
-    if(!empty($_POST))
-    {
-        $username = $_POST['username'];
-        $password = $_POST['password'];
-
-        // Строка подключения
-        $connection_string = "host=$_ENV['DB_HOST'] port='5432' dbname=$_ENV['DB_NAME'] user=$_ENV['DB_USER'] password=$_ENV['DB_PASSWORD']";
-
-        // Пробуем подключиться
-        $con = pg_connect($connection_string);
-        $query = 'SELECT * FROM users WHERE login = $1 AND password = $2';
-        $par = [
-            'user_name' => $username,
-            'user_password' => $password
-        ];
-        $result = pg_query_params($con,$query,$par);
-        $user = pg_fetch_assoc($result);
-        if(!empty($user))
-        {
-            $_SESSION['user_name'] = $user['login'];
-            $_SESSION['user_acl'] = $user['acl'];
-            Header('Location:home');
-            exit;
-        }
-    }
+if (session_status() !== PHP_SESSION_ACTIVE) {
+    session_start();
+}
+// Если админ уже залогинен, перенаправляем в панель
+if (!empty($_SESSION['user_name'])) {
+    header('Location: /admin/home');
+    exit;
+}
 ?>
 <div class="bb_root" style="width:100%;">
     <div class="_2cvxxeAj5gGKb86simBsB-">
@@ -47,14 +26,13 @@
                     <p class="login-subtitle">Доступ только для администраторов</p>
                 </div>
 
-                <?php if (isset($error)): ?>
-                <div class="error-message" data-aos="fade-down">
+                <!-- Блок для динамического вывода ошибок через JS -->
+                <div class="error-message" id="js-error" style="display: none;" data-aos="fade-down">
                     <span class="error-icon">⚠️</span>
-                    <span class="error-text"><?php echo htmlspecialchars($error); ?></span>
+                    <span class="error-text" id="js-error-text"></span>
                 </div>
-                <?php endif; ?>
 
-                <form class="login-form" method="POST" action="">
+                <form class="login-form" action="javascript:void(0);" id="adminLoginForm">
                     <div class="form-group">
                         <div class="input-wrapper">
                             <input type="text" id="username" name="username" class="form-input" placeholder=" " required autocomplete="off">
@@ -72,7 +50,7 @@
                     </div>
 
                     <div class="form-actions" data-aos="fade-up" data-aos-delay="300">
-                        <button type="submit" class="login-btn">
+                        <button type="submit" class="login-btn" id="submitBtn">
                             <span class="btn-icon">▶</span>
                             <span class="btn-text">Войти в панель управления</span>
                         </button>
@@ -86,14 +64,46 @@
                     </div>
                 </div>
             </div>
-
-            <div class="login-decoration">
-                <div class="decoration-line"></div>
-                <div class="decoration-dots">
-                    <span></span><span></span><span></span>
-                </div>
-                <div class="decoration-line"></div>
-            </div>
         </div>
     </div>
 </div>
+
+<!-- Подключение jQuery и обработчик отправки -->
+<script src="/api/jquery.min.js"></script>
+<script>
+    $(document).ready(function() {
+        $('#adminLoginForm').on('submit', function(e) {
+            e.preventDefault(); // Запрещаем стандартную отправку страницы
+
+            const $err = $('#error-message');
+            const $btn = $('#submitBtn');
+
+            $err.hide();
+            $btn.prop('disabled', true);
+
+            // Отправляем асинхронный запрос к нашему API
+            $.ajax({
+                url: '/api/login.php',
+                type: 'POST',
+                dataType: 'json',
+                data: {
+                    username: $('#username').val(),
+                    password: $('#password').val()
+                },
+                success: function(res) {
+                    if (res.success) {
+                        // Редирект средствами JS
+                        window.location.href = res.redirect;
+                    } else {
+                        $err.text(res.error).show();
+                        $btn.prop('disabled', false);
+                    }
+                },
+                error: function(xhr) {
+                    $err.text('Ошибка сервера (код ' + xhr.status + ')').show();
+                    $btn.prop('disabled', false);
+                }
+            });
+        });
+    });
+</script>

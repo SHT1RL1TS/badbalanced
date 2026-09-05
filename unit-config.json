@@ -7,41 +7,20 @@
     "routes": [
         {
             "match": {
-                "uri": "/admin/patch/edit/*"
+                "uri": [
+                    "/adminer.css*",
+                    "/adminer/adminer.css*"
+                ]
             },
             "action": {
-                "rewrite": "admin/patches/add_change.php",
-                "pass": "applications/php_admin"
-            }
-        },
-        {
-            "match": {
-                "uri": "/admin/patch/*"
-            },
-            "action": {
-                "rewrite": "admin/patches/view_single_patch.php",
-                "pass": "applications/php_admin"
+                "share": "/var/www/html/admin/tools/adminer.css"
             }
         },
         {
             "match": {
                 "uri": [
-                    "*.css",
-                    "*.js",
-                    "*.png",
-                    "*.jpg",
-                    "*.jpeg",
-                    "*.gif",
-                    "*.svg",
-                    "*.ico",
-                    "*.woff",
-                    "*.woff2",
-                    "*.ttf",
-                    "*.eot",
-                    "*.map",
-                    "*.webp",
-                    "*.mp4",
-                    "*.webm"
+                    "*.css", "*.js", "*.png", "*.jpg", "*.jpeg", "*.gif", "*.mp4",
+                    "*.svg", "*.ico", "*.woff", "*.woff2", "*.ttf", "*.eot", "*.webm"
                 ]
             },
             "action": {
@@ -49,6 +28,14 @@
                 "fallback": {
                     "pass": "applications/php_client"
                 }
+            }
+        },
+        {
+            "match": {
+                "uri": "/adminer*"
+            },
+            "action": {
+                "pass": "applications/php_adminer"
             }
         },
         {
@@ -68,14 +55,6 @@
             }
         },
         {
-            "match": {
-                "uri": "/client/*"
-            },
-            "action": {
-                "pass": "applications/php_client"
-            }
-        },
-        {
             "action": {
                 "pass": "applications/php_client"
             }
@@ -84,7 +63,7 @@
     "applications": {
         "php_client": {
             "type": "php",
-            "root": "/var/www/html/",
+            "root": "/var/www/html",
             "script": "client/index.php"
         },
         "php_admin": {
@@ -92,10 +71,14 @@
             "root": "/var/www/html",
             "script": "admin/index.php"
         },
+        "php_adminer": {
+            "type": "php",
+            "root": "/var/www/html/admin/tools",
+            "script": "adminer.php"
+        },
         "php_api": {
             "type": "php",
-            "root": "/var/www/html",
-            "index": "index.php"
+            "root": "/var/www/html"
         }
     }
 }

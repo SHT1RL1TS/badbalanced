@@ -1,82 +1,82 @@
 <?php
-// skills_api.php — REST API для скиллов (AJAX/jQuery)
+ini_set('display_errors', '0');
 header('Content-Type: application/json; charset=utf-8');
+
 require_once __DIR__ . '/db.php';
 $db = getDb_();
-$method = $_SERVER['REQUEST_METHOD'];
-$input = json_decode(file_get_contents('php://input'), true);
-switch ($method) {
-    case 'GET':
-        $action = $_GET['action'] ?? 'list';
-        if ($action === 'list') {
-            try {
-                $stmt = $db->query('SELECT s.*, h.name_hero, p.name as patch_name FROM skills s LEFT JOIN heroes h ON s.id_hero = h.id_hero LEFT JOIN pathes p ON s.id = p.id ORDER BY s.name_skill');
-                echo json_encode(['success' => true, 'data' => $stmt->fetchAll(PDO::FETCH_ASSOC)]);
-            } catch (PDOException $e) {
-                echo json_encode(['success' => false, 'message' => $e->getMessage()]);
-            }
-        } elseif ($action === 'get' && isset($_GET['id'])) {
-            try {
-                $skill = getSkillById($db, $_GET['id']);
-                echo json_encode(['success' => true, 'data' => $skill]);
-            } catch (PDOException $e) {
-                echo json_encode(['success' => false, 'message' => $e->getMessage()]);
-            }
-        } elseif ($action === 'by_hero' && isset($_GET['hero_id'])) {
-            try {
-                $skills = getHeroSkills($db, $_GET['hero_id']);
-                echo json_encode(['success' => true, 'data' => $skills]);
-            } catch (PDOException $e) {
-                echo json_encode(['success' => false, 'message' => $e->getMessage()]);
-            }
-        }
-        break;
-    case 'POST':
-        $action = $input['action'] ?? $_POST['action'] ?? 'create';
-        if ($action === 'create') {
-            try {
-                $name = $input['name_skill'] ?? $_POST['name_skill'] ?? '';
-                $desc = $input['description_skill'] ?? $_POST['description_skill'] ?? '';
-                $img = $input['image_url_skill'] ?? $_POST['image_url_skill'] ?? '';
-                $hero_id = $input['id_hero'] ?? $_POST['id_hero'] ?? null;
-                $patch_id = $input['id'] ?? $_POST['id'] ?? null;
-                $stmt = $db->prepare('INSERT INTO skills (name_skill, description_skill, image_url_skill, id_hero, id) VALUES (:name, :desc, :img, :hero_id, :patch_id) RETURNING id_skill');
-                $stmt->execute([':name' => $name, ':desc' => $desc, ':img' => $img,':hero_id' => $hero_id, ':patch_id' => $patch_id]);
-                $id = $stmt->fetchColumn();
-                echo json_encode(['success' => true, 'id' => $id, 'message' => 'Skill created']);
-            } catch (PDOException $e) {
-                echo json_encode(['success' => false, 'message' => $e->getMessage()]);
-            }
-        } elseif ($action === 'update') {
-            try {
-                $id = $input['id_skill'] ?? $_POST['id_skill'] ?? 0;
-                $name = $input['name_skill'] ?? $_POST['name_skill'] ?? '';
-                $desc = $input['description_skill'] ?? $_POST['description_skill'] ?? '';
-                $img = $input['image_url_skill'] ?? $_POST['image_url_skill'] ?? '';
-                $hero_id = $input['id_hero'] ?? $_POST['id_hero'] ?? null;
-                $patch_id = $input['id'] ?? $_POST['id'] ?? null;
 
-                $stmt = $db->prepare('UPDATE skills SET name_skill=:name, description_skill=:desc, image_url_skill=:img, id_hero=:hero_id, id=:patch_id WHERE id_skill=:id');
-                $stmt->execute([
-                    ':id' => $id, ':name' => $name, ':desc' => $desc, ':img' => $img,
-                    ':hero_id' => $hero_id, ':patch_id' => $patch_id
-                ]);
-                echo json_encode(['success' => true, 'message' => 'Skill updated']);
-            } catch (PDOException $e) {
-                echo json_encode(['success' => false, 'message' => $e->getMessage()]);
-            }
-        }
-        break;
-    case 'DELETE':
-        try {
-            $id = $input['id_skill'] ?? $_GET['id'] ?? 0;
-            $stmt = $db->prepare('DELETE FROM skills WHERE id_skill = :id');
-            $stmt->execute([':id' => $id]);
-            echo json_encode(['success' => true, 'message' => 'Skill deleted']);
-        } catch (PDOException $e) {
-            echo json_encode(['success' => false, 'message' => $e->getMessage()]);
-        }
-        break;
-    default:
-        echo json_encode(['success' => false, 'message' => 'Method not allowed']);
+$action = $_POST['action'] ?? '';
+
+try {
+    // 1. Список всех героев для выпадающего списка
+    if ($action === 'heroes') {
+        $stmt = $db->query('SELECT id, display_name FROM heroes ORDER BY display_name ASC');
+        echo json_encode(['success' => true, 'data' => $stmt->fetchAll(PDO::FETCH_ASSOC)]);
+        exit;
+    }
+
+    // 2. Список способностей с привязкой к герою
+    if ($action === 'list') {
+        $stmt = $db->query('
+            SELECT a.id, a.internal_name, a.display_name, a.hero_id, a.is_ultimate, a.is_talent,
+                   h.display_name AS hero_name
+            FROM abilities a
+            LEFT JOIN heroes h ON a.hero_id = h.id
+            ORDER BY a.id ASC
+        ');
+        echo json_encode(['success' => true, 'data' => $stmt->fetchAll(PDO::FETCH_ASSOC)]);
+        exit;
+    }
+
+    // 3. Получение одной способности для модалки
+    if ($action === 'get') {
+        $id = (int)($_POST['id'] ?? 0);
+        $stmt = $db->prepare('SELECT id, internal_name, display_name, hero_id, is_ultimate, is_talent FROM abilities WHERE id = ?');
+        $stmt->execute([$id]);
+        echo json_encode(['success' => true, 'data' => $stmt->fetch(PDO::FETCH_ASSOC)]);
+        exit;
+    }
+
+    // 4. Создание
+    if ($action === 'create') {
+        $internal = trim($_POST['internal_name'] ?? '');
+        $display  = trim($_POST['display_name'] ?? '');
+        $heroId   = !empty($_POST['hero_id']) ? (int)$_POST['hero_id'] : null;
+        $ultimate = filter_var($_POST['is_ultimate'] ?? false, FILTER_VALIDATE_BOOLEAN) ? 'true' : 'false';
+        $talent   = filter_var($_POST['is_talent'] ?? false, FILTER_VALIDATE_BOOLEAN) ? 'true' : 'false';
+
+        $stmt = $db->prepare('INSERT INTO abilities (internal_name, display_name, hero_id, is_ultimate, is_talent) VALUES (?, ?, ?, ?, ?)');
+        $stmt->execute([$internal, $display, $heroId, $ultimate, $talent]);
+        echo json_encode(['success' => true]);
+        exit;
+    }
+
+    // 5. Обновление
+    if ($action === 'update') {
+        $id       = (int)($_POST['id'] ?? 0);
+        $internal = trim($_POST['internal_name'] ?? '');
+        $display  = trim($_POST['display_name'] ?? '');
+        $heroId   = !empty($_POST['hero_id']) ? (int)$_POST['hero_id'] : null;
+        $ultimate = filter_var($_POST['is_ultimate'] ?? false, FILTER_VALIDATE_BOOLEAN) ? 'true' : 'false';
+        $talent   = filter_var($_POST['is_talent'] ?? false, FILTER_VALIDATE_BOOLEAN) ? 'true' : 'false';
+
+        $stmt = $db->prepare('UPDATE abilities SET internal_name = ?, display_name = ?, hero_id = ?, is_ultimate = ?, is_talent = ? WHERE id = ?');
+        $stmt->execute([$internal, $display, $heroId, $ultimate, $talent, $id]);
+        echo json_encode(['success' => true]);
+        exit;
+    }
+
+    // 6. Удаление
+    if ($action === 'delete') {
+        $id = (int)($_POST['id'] ?? 0);
+        $stmt = $db->prepare('DELETE FROM abilities WHERE id = ?');
+        $stmt->execute([$id]);
+        echo json_encode(['success' => true]);
+        exit;
+    }
+
+    echo json_encode(['success' => false, 'message' => 'Неизвестное действие']);
+} catch (Throwable $e) {
+    http_response_code(500);
+    echo json_encode(['success' => false, 'message' => $e->getMessage()]);
 }

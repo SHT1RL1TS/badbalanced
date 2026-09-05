@@ -6,9 +6,9 @@
   <div class="RsnZktJ6AqSXT0LNzVzby">
     <a class="ZFf5SKOhUeoF1JmIVX9RT" href="home"></a>
     <div class="_3WYkc7ouYrp_o9fb9euwrA">
-      <a class="_15Uwp7E3cvI8g0xSa_K9WK <?= $currentPage === 'custom' ? '_3ulNR3VlHLYvZ3PQlOXxdm' : '' ?>" href="custom">Кастомка</a>
-      <a class="_15Uwp7E3cvI8g0xSa_K9WK <?= $currentPage === 'heros' ? '_3ulNR3VlHLYvZ3PQlOXxdm' : '' ?>" href="heros">ГЕРОИ</a>
-      <a class="_15Uwp7E3cvI8g0xSa_K9WK <?= $currentPage === 'news' ? '_3ulNR3VlHLYvZ3PQlOXxdm' : '' ?>" href="news">Новости</a>
+      <a class="_15Uwp7E3cvI8g0xSa_K9WK <?= $currentPage === 'custom' ? '_3ulNR3VlHLYvZ3PQlOXxdm' : '' ?>" href="/custom">Кастомка</a>
+      <a class="_15Uwp7E3cvI8g0xSa_K9WK <?= $currentPage === 'heros' ? '_3ulNR3VlHLYvZ3PQlOXxdm' : '' ?>" href="/heros">ГЕРОИ</a>
+      <a class="_15Uwp7E3cvI8g0xSa_K9WK <?= $currentPage === 'news' ? '_3ulNR3VlHLYvZ3PQlOXxdm' : '' ?>" href="/news">Новости</a>
     </div>
     <div class="_11fequj40klP5KTtmPsvjc">
       <a class="_3vieaG5rLZslvZ_VHHW52V" href="<?=$link_cus?>">

@@ -1,5 +1,5 @@
 <?php
     unset($_SESSION['user_name']);
     session_destroy();
-    Header('Location:login');
+    Header('Location:admin/login');
 ?>

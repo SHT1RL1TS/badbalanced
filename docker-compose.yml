@@ -27,6 +27,7 @@ services:
       DB_USER: root
       DB_PASSWORD: jdp96n
       DB_NAME: butbalanced
+      POSTGRES_DB: bb
     volumes:
       - ./web:/var/www/html
       - ./unit-config.json:/docker-entrypoint.d/config.json:ro

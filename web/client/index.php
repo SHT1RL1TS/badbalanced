@@ -1,19 +1,16 @@
 <?php
-if(session_status() !== PHP_SESSION_ACTIVE)
-{
+if (session_status() !== PHP_SESSION_ACTIVE) {
     session_start();
 }
-$uri = parse_url($_SERVER["REQUEST_URI"], PHP_URL_PATH);
-$route = trim($uri, "/");
 
-// Убираем префикс client/ или client/index.php/
-$route = preg_replace('#^client(/index\.php)?/#', '', $route);
+$route = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+$route = rtrim($route, '/');
 
-if ($route === "" || $route === "index.php") {
-    $route = "home";
+// Если пришли на корень сайта "/", делаем его "/home"
+if ($route === '' || $route === '/index.php') {
+    $route = '/home';
 }
 
-// Базовый URL для CSS и ссылок
 $baseUrl = "/";
 $link_cus = "https://steamcommunity.com/sharedfiles/filedetails/?id=3699416108";
 
@@ -25,14 +22,15 @@ if (!isset($css)) {
 }
 if (!isset($api)) {
     $api = [
-        "../api/db.php",
-        "../api/functions.php"
+        __DIR__ . "/../api/db.php",
+        __DIR__ . "/../api/functions.php"
     ];
 }
 foreach ((array)$api as $file) {
-    require_once $file;
+    if (file_exists($file)) {
+        require_once $file;
+    }
 }
-/** @var PDO $db */
 $db = getDb();
 ?>
 
@@ -57,16 +55,17 @@ $db = getDb();
                 // } else {
                 // }
                 switch ($route) {
-                    case "home":
+                    case "/":
+                    case "/home":
                         include "home.php";
                         break;
-                    case "news":
+                    case "/news":
                         include "news.php";
                         break;
-                    case "heros":
+                    case "/heros":
                         include "heroes.php";
                         break;
-                    case "custom":
+                    case "/custom":
                         include "custom.php";
                         break;
                     default:
@@ -76,19 +75,19 @@ $db = getDb();
             <script src="<?= $baseUrl ?>JS/aos.js"></script>
             <!-- Общие скрипты -->
             <?php switch ($route) {
-                case "news":
+                case "/news":
                     echo '<script src="' .
                         '../JS/NEWS_JS.js"></script>';
                     break;
-                case "heros":
+                case "/heros":
                     echo '<script src="' .
                         '../JS/HEROES_JS.js"></script>';
                     break;
-                case "custom":
+                case "/custom":
                     echo '<script src="' .
                         '../JS/CUSTOM_JS.js"></script>';
                     break;
-                case "home":
+                case "/home":
                     echo '<script src="' .
                         '../JS/HOME_JS.js"></script>';
                     break;

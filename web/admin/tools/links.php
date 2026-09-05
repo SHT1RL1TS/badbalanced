@@ -4,22 +4,25 @@
 
 <!-- CSS для конкретных страниц -->
 <?php
+if (preg_match('#^/admin/patch/(\d+)$#', $route, $matches)) {
+    $patchId = (int)$matches[1]; // Достаем ID патча
+    echo '<link rel="stylesheet" type="text/css" href="' . $css . 'ADMIN_VIEWER_PATCH_CSS.css">';
+}
 switch ($route) {
-    case 'home':
+    case '/admin/home':
         echo '<link rel="stylesheet" type="text/css" href="' . $css . 'HOME_CSS.css">';
         break;
-    case 'login':
+    case '/admin/login':
         echo '<link rel="stylesheet" type="text/css" href="' . $css . 'ADMIN_LOGIN_CSS.css">';
         break;
-    case 'heroes':
+    case '/admin/heroes':
         echo '<link rel="stylesheet" type="text/css" href="' . $css . 'HEROES_CSS.css">';
         break;
-    case 'admin':
-        echo '<link rel="stylesheet" type="text/css" href="' . $css . 'ADMIN_CSS.css">';
+    case '/admin/skills':
+        echo '<link rel="stylesheet" type="text/css" href="' . $css . 'ADMIN_EDITOR_CSS.css">';
         break;
-    case 'skills':
-    case 'items':
-    case 'patches':
+    case '/admin/items':
+    case '/admin/patches':
         echo '<link rel="stylesheet" type="text/css" href="' . $css . 'ADMIN_EDITOR_CSS.css">';
         break;
     default:
